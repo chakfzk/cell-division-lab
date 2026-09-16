@@ -3,16 +3,21 @@
 <style>
 /* 폰트: 학교망에서 외부 요청이 막히는 경우가 있어 시스템 폰트만 사용한다. */
 :root{
-  --ground:#f6f2f8;
+  /* 모드별 색 한 벌 — 바탕뿐 아니라 버튼·타임라인·돋보기 테두리까지 같이 바뀐다.
+     비교 모드는 두 줄의 색이 주인공이므로 일부러 중립(무채색)으로 둔다. */
+  --bg-mit:#efe9f4;  --gr-mit:#f6f2f8;  --ac-mit:#8e3b7a;  --ac-mit-s:#f4e7f1;
+  --bg-mei:#e2eaf6;  --gr-mei:#eff4fa;  --ac-mei:#2b5fa5;  --ac-mei-s:#e3ecf9;
+  --bg-cmp:#fafafc;  --gr-cmp:#f4f4f8;  --ac-cmp:#4a5570;  --ac-cmp-s:#ebedf3;
+  --ground:var(--gr-mit);
   --panel:#ffffff;
-  --stage-bg:#efe9f4;
+  --stage-bg:var(--bg-mit);
   --ink:#241a2b;
   --ink-2:#584c64;
   --muted:#8a7f95;
   --line:#e7dcec;
   --line-strong:#d2c3da;
-  --accent:#8e3b7a;
-  --accent-soft:#f4e7f1;
+  --accent:var(--ac-mit);
+  --accent-soft:var(--ac-mit-s);
   --accent-ink:#ffffff;
   --cyto:#e8f0fc;
   --cyto-2:#cfdff6;
@@ -32,10 +37,13 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --ground:#15101f; --panel:#1e1729; --stage-bg:#191324;
+    --bg-mit:#191324; --gr-mit:#15101f; --ac-mit:#dd90c8; --ac-mit-s:#331f39;
+    --bg-mei:#141e2e; --gr-mei:#0f1620; --ac-mei:#7fb3ec; --ac-mei-s:#16263d;
+    --bg-cmp:#101016; --gr-cmp:#0b0b10; --ac-cmp:#9aa6c4; --ac-cmp-s:#232733;
+    --panel:#1e1729;
     --ink:#f2ecf6; --ink-2:#c4b8ce; --muted:#93889f;
     --line:#302640; --line-strong:#463857;
-    --accent:#dd90c8; --accent-soft:#331f39; --accent-ink:#1b1226;
+    --accent-ink:#131018;
     --cyto:#22304d; --cyto-2:#2d4165; --cyto-line:#6f89b8;
     --nuc:#2b3d62; --nuc-line:#89a5d4;
     --chr-red:#f0705e; --chr-red-2:#f89383;
@@ -44,16 +52,24 @@
   }
 }
 :root[data-theme="dark"]{
-  --ground:#15101f; --panel:#1e1729; --stage-bg:#191324;
+  --bg-mit:#191324; --gr-mit:#15101f; --ac-mit:#dd90c8; --ac-mit-s:#331f39;
+  --bg-mei:#141e2e; --gr-mei:#0f1620; --ac-mei:#7fb3ec; --ac-mei-s:#16263d;
+  --bg-cmp:#101016; --gr-cmp:#0b0b10; --ac-cmp:#9aa6c4; --ac-cmp-s:#232733;
+  --panel:#1e1729;
   --ink:#f2ecf6; --ink-2:#c4b8ce; --muted:#93889f;
   --line:#302640; --line-strong:#463857;
-  --accent:#dd90c8; --accent-soft:#331f39; --accent-ink:#1b1226;
+  --accent-ink:#131018;
   --cyto:#22304d; --cyto-2:#2d4165; --cyto-line:#6f89b8;
   --nuc:#2b3d62; --nuc-line:#89a5d4;
   --chr-red:#f0705e; --chr-red-2:#f89383;
   --chr-blue:#7099e8; --chr-blue-2:#9ab8f4;
   --spindle:#7a6a8b; --label:#c8bbd3; --ok:#7fd0a4;
 }
+
+/* 감수 분열은 푸른 계열로 — 두 모드를 오갈 때 지금 무엇을 보고 있는지 바로 알 수 있게.
+   비교 모드는 어느 한쪽 색을 쓰면 다른 쪽이 곁다리로 보이므로 중립색을 쓴다. */
+:root[data-scen="meiosis"]{ --ground:var(--gr-mei); --stage-bg:var(--bg-mei); --accent:var(--ac-mei); --accent-soft:var(--ac-mei-s); }
+:root[data-scen="compare"]{ --ground:var(--gr-cmp); --stage-bg:var(--bg-cmp); --accent:var(--ac-cmp); --accent-soft:var(--ac-cmp-s); }
 
 *{box-sizing:border-box}
 body{
@@ -121,6 +137,10 @@ h1{margin:0;font-size:clamp(24px,3.2vw,33px);line-height:1.15;font-weight:800;le
 }
 .lbl path{stroke:var(--label);stroke-width:1.1;fill:none;opacity:.55}
 .lbl .dot{fill:var(--label);stroke:none}
+.band{stroke:var(--line);stroke-width:1}
+.band.mit{fill:var(--bg-mit)}
+.band.mei{fill:var(--bg-mei)}
+.bandtag{font-family:var(--f-ui);font-size:14px;font-weight:800;fill:var(--muted);letter-spacing:.02em}
 #lens{pointer-events:none;transition:opacity .12s ease}
 #lensBg{fill:var(--stage-bg)}
 #lensRing{fill:none;stroke:var(--accent);stroke-width:2.5;opacity:.8}
@@ -170,8 +190,15 @@ button{font:inherit;cursor:pointer}
 .warn[hidden]{display:none!important}
 
 /* ── 단계 띠 ──────────────────────────────── */
+/* 단계가 많아지면(감수 분열 10칸) 좁은 화면에서 가로로 밀어 볼 수 있게 한다 */
+.tl-wrap{overflow-x:auto}
 .timeline{list-style:none;margin:0;padding:10px 12px 0;display:grid;gap:5px}
 .timeline li{min-width:0}
+/* 이름은 반드시 한 줄 — 칸 너비는 JS가 minmax로 최소값을 보장한다 */
+.timeline .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timeline.many .t{font-size:11.5px}
+.timeline.many .n{font-size:10.5px}
+.timeline.many button{padding:8px 5px 9px;min-height:54px}
 .ruler-note{margin:0;padding:6px 14px 15px;font-size:12.5px;color:var(--muted)}
 .ruler-note b{color:var(--ink-2);font-weight:700}
 .timeline button{
@@ -204,6 +231,30 @@ button{font:inherit;cursor:pointer}
 .tile.hold .v{color:var(--ok)}
 .tile .u{display:block;font-size:11px;color:var(--muted);margin-top:1px}
 .note{margin:10px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+.note b{color:var(--ink-2)}
+
+/* ── 나란히 비교 ─────────────────────────── */
+#obsCmp[hidden],#cmpTable[hidden],#obs[hidden],#tiles[hidden]{display:none!important}
+.side-by{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.side-by p{margin:0;font-size:13.5px;color:var(--ink-2);flex:1;min-width:0}
+.tag{
+  flex:none;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;
+  white-space:nowrap;margin-top:1px;border:1px solid var(--line-strong);
+}
+.tag.mit{background:var(--bg-mit);color:var(--ink-2)}
+.tag.mei{background:var(--bg-mei);color:var(--ink-2)}
+.diff{
+  margin:12px 0 0;padding:10px 12px;font-size:13.5px;color:var(--ink);
+  background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 var(--r-s) var(--r-s) 0;
+}
+.diff b{font-weight:800}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+table.cmp th,table.cmp td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:center}
+table.cmp thead th{font-size:11.5px;color:var(--muted);font-weight:800}
+table.cmp tbody th{text-align:left;color:var(--muted);font-weight:700;font-size:12px}
+table.cmp td{font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+table.cmp tr.hold td{color:var(--ok)}
+table.cmp tbody tr:last-child th,table.cmp tbody tr:last-child td{border-bottom:0}
 
 .q{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 var(--r-m) var(--r-m) 0;padding:13px 15px;margin:0}
 .q p{margin:0;font-size:14.5px;font-weight:700;color:var(--ink);text-wrap:balance}
@@ -238,6 +289,7 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
       <div class="modes" id="modes" role="group" aria-label="분열 종류">
         <button type="button" data-mode="mitosis" aria-pressed="true">체세포 분열</button>
         <button type="button" data-mode="meiosis" aria-pressed="false">감수 분열</button>
+        <button type="button" data-mode="compare" aria-pressed="false">나란히 비교</button>
       </div>
       <button class="theme-btn" id="themeBtn" type="button">화면 밝기 바꾸기</button>
     </div>
@@ -260,13 +312,16 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
           </radialGradient>
           <clipPath id="lensClip"><circle id="lensClipC" cx="0" cy="0" r="1"></circle></clipPath>
         </defs>
-        <g id="scene">
-          <g id="gCells"></g>
-          <g id="gFibers"></g>
-          <g id="gNuclei"></g>
-          <g id="gChrom"></g>
+        <!-- 나란히 비교에서 두 줄의 바탕. 색으로도 어느 분열인지 구분된다 -->
+        <g id="rowBands" opacity="0">
+          <rect class="band mit" x="8" y="50" width="984" height="232" rx="14"></rect>
+          <rect class="band mei" x="8" y="337" width="984" height="232" rx="14"></rect>
+          <text class="bandtag" x="26" y="78">체세포 분열</text>
+          <text class="bandtag" x="26" y="365">감수 분열</text>
         </g>
-        <g id="gLabels"></g>
+        <g id="scene"></g>
+        <!-- 이름표는 #scene 밖에 둔다 — 돋보기가 글자까지 확대하면 오히려 읽기 어렵다 -->
+        <g id="labelHost"></g>
         <!-- 돋보기: 같은 장면(#scene)을 참조하므로 재생 중에도 확대 화면이 함께 움직인다 -->
         <g id="lens" opacity="0">
           <circle id="lensBg" r="1"></circle>
@@ -307,7 +362,7 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         <p class="warn" id="nWarn" hidden></p>
       </div>
 
-      <ol class="timeline" id="timeline"></ol>
+      <div class="tl-wrap"><ol class="timeline" id="timeline"></ol></div>
       <p class="ruler-note">위 슬라이더와 아래 칸의 <b>가로 길이가 곧 걸리는 시간</b>입니다. 슬라이더는 일정한 속도로 흐르므로, 칸이 넓은 <b>분열 전이 가장 오래</b> 걸립니다.</p>
     </section>
 
@@ -315,15 +370,28 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
       <div class="card">
         <h2>지금 세포에서</h2>
         <p id="obs"></p>
+        <div id="obsCmp" hidden>
+          <div class="side-by"><span class="tag mit">체세포 분열</span><p id="obsA"></p></div>
+          <div class="side-by"><span class="tag mei">감수 분열</span><p id="obsB"></p></div>
+          <p class="diff" id="obsDiff"></p>
+        </div>
       </div>
 
       <div class="card">
         <h2>수 세어 보기</h2>
-        <div class="tiles">
+        <div class="tiles" id="tiles">
           <div class="tile"><span class="k">세포 수</span><span class="v" id="vCell">1</span><span class="u">개</span></div>
           <div class="tile hold"><span class="k">세포당 염색체 수</span><span class="v" id="vChr">4</span><span class="u">개</span></div>
           <div class="tile"><span class="k">DNA 상대량</span><span class="v" id="vDna">1.0</span><span class="u">배</span></div>
         </div>
+        <table class="cmp" id="cmpTable" hidden>
+          <thead><tr><th></th><th>체세포 분열</th><th>감수 분열</th></tr></thead>
+          <tbody>
+            <tr><th>세포 수</th><td id="cA1"></td><td id="cB1"></td></tr>
+            <tr class="hold"><th>세포당 염색체 수</th><td id="cA2"></td><td id="cB2"></td></tr>
+            <tr><th>DNA 상대량</th><td id="cA3"></td><td id="cB3"></td></tr>
+          </tbody>
+        </table>
         <p class="note" id="cntNote"></p>
       </div>
 
@@ -797,15 +865,62 @@ const NS="http://www.w3.org/2000/svg";
 const el=(n,at)=>{const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);return e;};
 const pick = (s,i) => s[Math.min(i, s.length-1)] || {x:0,y:0};
 
-const gCells=$("gCells"), gFibers=$("gFibers"), gNuclei=$("gNuclei"), gChrom=$("gChrom"), gLabels=$("gLabels");
-const cellEls = [el("path",{class:"cell"}), el("path",{class:"cell"})];
-cellEls.forEach(c=>gCells.appendChild(c));
-const nucEls = []; for(let i=0;i<5;i++){ const c=el("circle",{class:"nuc"}); nucEls.push(c); gNuclei.appendChild(c); }
-const astrals=[]; for(let i=0;i<16;i++){ const f=el("line",{class:"fiber astral"}); astrals.push(f); gFibers.appendChild(f); }
-let fibers=[], chrEls=[], lblEls=[], tlBtns=[];
+/* ───────── 무대 하나를 그리는 단위 ─────────
+   단독 모드에서는 하나, 나란히 비교에서는 둘을 만들어 위아래로 축소 배치한다. */
+function Renderer(){
+  this.g       = el("g",{});   $("scene").appendChild(this.g);
+  this.gLabels = el("g",{});   $("labelHost").appendChild(this.gLabels);
+  this.gCells  = el("g",{}); this.gFibers = el("g",{}); this.gNuclei = el("g",{}); this.gChrom = el("g",{});
+  [this.gCells,this.gFibers,this.gNuclei,this.gChrom].forEach(x=>this.g.appendChild(x));
+  this.cellEls = [el("path",{class:"cell"}), el("path",{class:"cell"})];
+  this.cellEls.forEach(c=>this.gCells.appendChild(c));
+  this.nucEls = []; for(let i=0;i<5;i++){ const c=el("circle",{class:"nuc"}); this.nucEls.push(c); this.gNuclei.appendChild(c); }
+  this.astrals = []; for(let i=0;i<16;i++){ const f=el("line",{class:"fiber astral"}); this.astrals.push(f); this.gFibers.appendChild(f); }
+  this.fibers = []; this.chrEls = []; this.lblEls = [];
+  this.SC = null; this.N = 0; this.CHROMS = []; this.KF = []; this.cap = 0;
+}
+Renderer.prototype.place = function(cx, cy, s){
+  const tr = s===1 ? "" : "translate("+cx+","+cy+") scale("+s+") translate("+(-CX)+","+(-CY)+")";
+  this.g.setAttribute("transform", tr);
+  this.gLabels.setAttribute("transform", tr);
+};
+Renderer.prototype.show = function(on){
+  this.g.setAttribute("opacity", on?"1":"0");
+  this.gLabels.setAttribute("opacity", on?"1":"0");
+  this.on = on;
+};
+Renderer.prototype.setScenario = function(sc){
+  this.SC = sc;
+  this.lblEls.forEach(e=>e.g.remove());
+  this.lblEls = sc.labels.map(()=>{
+    const g=el("g",{class:"lbl"});
+    const ln=el("path",{}), dt=el("circle",{class:"dot",r:2.6}), tx=el("text",{"text-anchor":"middle"});
+    g.appendChild(ln); g.appendChild(dt); g.appendChild(tx); this.gLabels.appendChild(g);
+    return {g:g,ln:ln,dt:dt,tx:tx};
+  });
+};
+/* 염색체 수가 바뀌면 도형과 방추사를 통째로 다시 만든다 */
+Renderer.prototype.setN = function(N){
+  this.N = N;
+  const built = this.SC.build(N);
+  this.CHROMS = built.chroms;
+  this.KF = this.CHROMS.map(c=>[makeTrack(built.frames(c,0)), makeTrack(built.frames(c,1))]);
+  this.fibers.forEach(f=>f.remove());
+  this.chrEls.forEach(c=>c.el.remove());
+  this.fibers=[]; this.chrEls=[];
+  for(let i=0;i<N;i++) for(let k=0;k<2;k++){
+    const f=el("line",{class:"fiber"});
+    this.fibers.push(f); this.gFibers.insertBefore(f, this.astrals[0]);
+    const p=el("path",{class:"chr "+this.CHROMS[i].color+(k?" k1":""), pathLength:"1"});
+    this.chrEls.push({el:p,i:i,k:k}); this.gChrom.appendChild(p);
+  }
+};
+
+let rendA = null, rendB = null;
+let tlBtns=[];
 
 /* ───────── 상태 ───────── */
-let SC = MITOSIS, N_CHR = 4, CHROMS = [], KF = [], T_END = 6;
+let MODE = "mitosis", SC = MITOSIS, N_CHR = 4, T_END = 6;
 let DUR = [], CUM = [], TOTAL = 0;
 let t=0, playing=false, speed=1, last=0, rafId=0;
 let stopAtStep=true, showLabel=true, showFiber=true, lensOn=true, lensDown=false;
@@ -821,25 +936,67 @@ function tOf(w){
   return i + (w-CUM[i])/DUR[i];
 }
 
-/* ───────── 시나리오 적용 ───────── */
-function applyScenario(sc, keepT){
-  SC = sc;
-  DUR = sc.dur.slice();
+/* ───────── 나란히 비교 ─────────
+   두 분열의 앞 다섯 단계(분열 전·전기·중기·후기·말기)는 서로 대응하므로 단계 번호를 그대로 맞춘다.
+   그다음부터 체세포 분열은 끝나 있고 감수 분열만 2분열을 이어 간다 — 그 자체가 가장 큰 차이다. */
+const COMPARE = {
+  sub:"두 분열을 위아래로 놓고 <b>같은 단계끼리 나란히</b> 재생합니다. 앞 다섯 단계는 서로 대응하고, 체세포 분열이 끝난 뒤에도 감수 분열은 두 번째 분열을 이어 갑니다.",
+  question:"감수 분열과 체세포 분열의 차이점을 염색체와 관련지어 설명해 보자.",
+  answer:"① 체세포 분열은 <b>한 번</b>, 감수 분열은 <b>두 번 연속</b> 분열합니다. ② 감수 분열에서만 <b>상동 염색체가 결합</b>했다가 1분열에서 갈라집니다. ③ 그래서 중기의 모습이 체세포 분열은 한 줄, 감수 1분열은 두 줄입니다. ④ 결과적으로 딸세포가 <b>2개·염색체 수 그대로</b>냐, <b>4개·염색체 수 절반</b>이냐로 갈립니다.",
+  diffs:[
+    "여기까지는 차이가 없습니다. 둘 다 DNA를 복제해 각 염색체가 두 가닥의 염색 분체가 됩니다.",
+    "체세포 분열은 염색체가 <b>따로따로</b> 나타나지만, 감수 분열은 <b>상동 염색체가 서로 결합</b>합니다. 첫 번째 갈림길입니다.",
+    "체세포 분열은 <b>한 줄</b>, 감수 1분열은 결합한 채라 <b>두 줄</b>로 배열합니다. 눈으로 가장 확실하게 구분되는 장면입니다.",
+    "갈라지는 것이 다릅니다. 체세포 분열은 <b>염색 분체</b>, 감수 1분열은 <b>상동 염색체</b>입니다.",
+    "둘 다 세포가 둘로 나뉘지만, 염색체 수가 체세포 분열은 <b>그대로</b>, 감수 분열은 <b>절반</b>입니다.",
+    "체세포 분열은 여기서 끝납니다. 감수 분열은 <b>DNA 복제 없이</b> 곧바로 두 번째 분열에 들어갑니다.",
+    "감수 2분열의 중기는 상동 염색체가 없으므로 체세포 분열처럼 <b>한 줄</b>입니다.",
+    "감수 2분열에서 갈라지는 것은 <b>염색 분체</b> — 체세포 분열의 후기와 같은 일입니다.",
+    "세포가 넷이 됩니다. 염색 분체가 갈라졌을 뿐이므로 <b>염색체 수는 더 줄지 않습니다</b>.",
+    "체세포 분열은 딸세포 <b>2개·염색체 수 그대로</b>, 감수 분열은 생식세포 <b>4개·염색체 수 절반</b>입니다."
+  ]
+};
+
+/* ───────── 모드 적용 ───────── */
+function applyMode(mode){
+  MODE = mode;
+  const compare = (mode==="compare");
+  SC = (mode==="mitosis") ? MITOSIS : MEIOSIS;      // 비교 모드의 기준 시계는 감수 분열
+  DUR = SC.dur.slice();
   CUM = [0]; for(let i=0;i<DUR.length;i++) CUM.push(CUM[i]+DUR[i]);
   TOTAL = CUM[DUR.length];
   T_END = DUR.length;
 
-  $("sub").innerHTML = sc.sub;
-  $("qText").textContent = sc.question;
-  $("answer").innerHTML = sc.answer;
+  document.documentElement.setAttribute("data-scen", mode);
+  $("sub").innerHTML = compare ? COMPARE.sub : SC.sub;
+  $("qText").textContent = compare ? COMPARE.question : SC.question;
+  $("answer").innerHTML = compare ? COMPARE.answer : SC.answer;
   $("scrub").max = TOTAL;
+  $("rowBands").setAttribute("opacity", compare?"1":"0");
+  $("obs").hidden = compare; $("obsCmp").hidden = !compare;
+  $("tiles").hidden = compare; $("cmpTable").hidden = !compare;
+  $("cLabel").disabled = compare;
+  $("cLabel").parentNode.style.opacity = compare ? ".45" : "";
 
-  /* 단계 띠 다시 만들기 */
+  if(!rendA) rendA = new Renderer();
+  if(!rendB) rendB = new Renderer();
+  rendA.setScenario(compare ? MITOSIS : SC);
+  rendA.cap = MITOSIS.dur.length;                   // 체세포 분열은 6단계에서 멈춰 있는다
+  rendB.setScenario(MEIOSIS);
+  rendA.setN(N_CHR); if(compare) rendB.setN(N_CHR);
+  rendB.show(compare);
+  if(compare){ rendA.place(CX, 166, 0.52); rendB.place(CX, 453, 0.52); }
+  else       { rendA.place(CX, CY, 1); }
+  rendA.show(true);
+
+  /* 단계 띠 다시 만들기 — 칸의 최소 너비를 보장해 이름이 두 줄로 접히지 않게 한다 */
   const tl = $("timeline"); tl.innerHTML = ""; tlBtns = [];
-  tl.style.gridTemplateColumns = DUR.map(d=>d.toFixed(2)+"fr").join(" ");
-  sc.steps.forEach((s,i)=>{
+  tl.className = "timeline" + (DUR.length > 6 ? " many" : "");
+  const minW = DUR.length > 6 ? 56 : 62;
+  tl.style.gridTemplateColumns = DUR.map(d=>"minmax("+minW+"px,"+d.toFixed(2)+"fr)").join(" ");
+  SC.steps.forEach((s,i)=>{
     const li=document.createElement("li");
-    if(sc.splitAt.indexOf(i)>=0) li.className="split";
+    if(SC.splitAt.indexOf(i)>=0) li.className="split";
     const b=document.createElement("button"); b.type="button";
     b.innerHTML='<span class="n">'+(i+1)+'</span><span class="t">'+(s.short||s.name)+'</span><span class="bar"><i></i></span>';
     b.addEventListener("click",()=>{ pause(); goTo(i); });
@@ -847,35 +1004,14 @@ function applyScenario(sc, keepT){
     tlBtns.push({b:b, fill:b.querySelector("i")});
   });
 
-  /* 이름표 다시 만들기 */
-  lblEls.forEach(e=>e.g.remove());
-  lblEls = sc.labels.map(()=>{
-    const g=el("g",{class:"lbl"});
-    const ln=el("path",{}), dt=el("circle",{class:"dot",r:2.6}), tx=el("text",{"text-anchor":"middle"});
-    g.appendChild(ln); g.appendChild(dt); g.appendChild(tx); gLabels.appendChild(g);
-    return {g:g,ln:ln,dt:dt,tx:tx};
-  });
-
-  rebuild(N_CHR);
   showFinished = false;
-  setT(keepT ? clamp(t,0,T_END) : 0);
+  setT(0);
 }
 
-/* 염색체 수가 바뀌면 도형과 방추사를 통째로 다시 만든다 */
 function rebuild(N){
   N_CHR = N;
-  const built = SC.build(N);
-  CHROMS = built.chroms;
-  KF = CHROMS.map(c=>[makeTrack(built.frames(c,0)), makeTrack(built.frames(c,1))]);
-  fibers.forEach(f=>f.remove());
-  chrEls.forEach(c=>c.el.remove());
-  fibers=[]; chrEls=[];
-  for(let i=0;i<N;i++) for(let k=0;k<2;k++){
-    const f=el("line",{class:"fiber"});
-    fibers.push(f); gFibers.insertBefore(f, astrals[0]);
-    const p=el("path",{class:"chr "+CHROMS[i].color+(k?" k1":""), pathLength:"1"});
-    chrEls.push({el:p,i:i,k:k}); gChrom.appendChild(p);
-  }
+  rendA.setN(N);
+  if(MODE==="compare") rendB.setN(N);
   const w = $("nWarn");
   w.hidden = (N !== 46);
   if(N===46) w.innerHTML = "<b>46개는 사람의 염색체 수입니다.</b> 한 줄로 세우면 하나하나가 아주 작아져 세어 보기는 어렵습니다. 수가 얼마나 많은지 실감하는 용도로 쓰고, 모양을 볼 때는 무대 위에 마우스를 올려 돋보기로 확대해 보세요.";
@@ -885,7 +1021,10 @@ function rebuild(N){
 function repAt(t){ return t>=1 ? 1 : ease(clamp((t-0.20)/0.55,0,1)); }
 
 /* ───────── 그리기 ───────── */
-function draw(){
+Renderer.prototype.draw = function(t, useLabels){
+  const SC = this.SC, cellEls = this.cellEls, nucEls = this.nucEls,
+        chrEls = this.chrEls, fibers = this.fibers, astrals = this.astrals,
+        gFibers = this.gFibers, lblEls = this.lblEls, N_CHR = this.N;
   const g = SC.geom(t);
   const rep = repAt(t);
 
@@ -906,7 +1045,7 @@ function draw(){
     } else e.setAttribute("opacity","0");
   });
 
-  const states=[];
+  const states=[], KF = this.KF;
   chrEls.forEach(c=>{
     const st = stateAt(KF[c.i][c.k], t);
     c.el.setAttribute("d", chrPath(st,c.k,g,rep));
@@ -944,7 +1083,7 @@ function draw(){
 
   /* 이름표 — 연결선이 가리키는 점은 그때그때의 세포·핵 크기에서 계산한다 */
   SC.labels.forEach((L,i)=>{
-    const on = showLabel && (L.req!=="fiber" || showFiber);
+    const on = useLabels && showLabel && (L.req!=="fiber" || showFiber);
     const o = on ? band(t,L.t[0],L.t[1],L.t[2],L.t[3]) : 0;
     const e = lblEls[i];
     e.g.setAttribute("opacity",o.toFixed(3));
@@ -959,7 +1098,16 @@ function draw(){
     e.dt.setAttribute("cx",ax.toFixed(1)); e.dt.setAttribute("cy",ay.toFixed(1));
     e.ln.setAttribute("d","M"+px.toFixed(1)+","+my.toFixed(1)+"Q"+px.toFixed(1)+","+((my+ay)/2).toFixed(1)+" "+ax.toFixed(1)+","+ay.toFixed(1));
   });
+};
 
+/* 모드에 따라 한 무대 또는 두 무대를 그린다 */
+function draw(){
+  if(MODE==="compare"){
+    rendA.draw(Math.min(t, rendA.cap), false);
+    rendB.draw(t, false);
+  } else {
+    rendA.draw(t, true);
+  }
   updatePanel();
 }
 
@@ -975,7 +1123,6 @@ function updatePanel(){
   $("stepNo").textContent = i+1;
   $("stepName").textContent = s.name;
   $("stepLine").textContent = s.line;
-  $("obs").innerHTML = s.obs.replace(/\{N\}/g, N_CHR);
   $("clock").textContent = (i+1)+" / "+SC.steps.length+" 단계"+(finished?" 끝":"")+" · 2n="+N_CHR;
 
   tlBtns.forEach((b,n)=>{
@@ -983,10 +1130,26 @@ function updatePanel(){
     b.fill.style.width = (n<i?100:(n===i?(t-i)*100:0)).toFixed(1)+"%";
   });
 
-  const c = SC.counts(t, N_CHR, repAt(t));
-  const put=(id,txt)=>{ const e=$(id); e.textContent=txt; e.style.fontSize = txt.length>5 ? "16px" : (txt.length>3 ? "18px" : ""); };
-  put("vCell", c.cell); put("vChr", c.chr); put("vDna", c.dna);
-  $("cntNote").innerHTML = c.note;
+  if(MODE==="compare"){
+    const tA = Math.min(t, rendA.cap), iA = clamp(Math.floor(tA+1e-9),0,MITOSIS.steps.length-1);
+    const overA = t > MITOSIS.steps.length - 0.02;
+    $("obsA").innerHTML = overA
+      ? "<b>이미 끝났습니다.</b> 딸세포 두 개로 분열이 완료된 상태 그대로입니다."
+      : MITOSIS.steps[iA].name + " — " + MITOSIS.steps[iA].line;
+    $("obsB").innerHTML = SC.steps[i].name + " — " + SC.steps[i].line;
+    $("obsDiff").innerHTML = COMPARE.diffs[i];
+    const cA = MITOSIS.counts(Math.min(tA, MITOSIS.dur.length), N_CHR, repAt(tA));
+    const cB = MEIOSIS.counts(t, N_CHR, repAt(t));
+    $("cA1").textContent=cA.cell; $("cA2").textContent=cA.chr; $("cA3").textContent=cA.dna;
+    $("cB1").textContent=cB.cell; $("cB2").textContent=cB.chr; $("cB3").textContent=cB.dna;
+    $("cntNote").innerHTML = "가운데 줄을 보세요. 체세포 분열은 끝까지 <b>"+N_CHR+"개</b> 그대로지만, 감수 분열은 1분열에서 <b>"+(N_CHR/2)+"개</b>로 줄어든 뒤 더는 줄지 않습니다.";
+  } else {
+    $("obs").innerHTML = s.obs.replace(/\{N\}/g, N_CHR);
+    const c = SC.counts(t, N_CHR, repAt(t));
+    const put=(id,txt)=>{ const e=$(id); e.textContent=txt; e.style.fontSize = txt.length>5 ? "16px" : (txt.length>3 ? "18px" : ""); };
+    put("vCell", c.cell); put("vChr", c.chr); put("vDna", c.dna);
+    $("cntNote").innerHTML = c.note;
+  }
   const an = $("ansN"); if(an) an.textContent = N_CHR+"개";
 }
 
@@ -1094,7 +1257,7 @@ document.querySelectorAll("#modes button").forEach(b=>{
     if(b.getAttribute("aria-pressed")==="true") return;
     pause();
     document.querySelectorAll("#modes button").forEach(o=>o.setAttribute("aria-pressed", String(o===b)));
-    applyScenario(b.dataset.mode==="meiosis" ? MEIOSIS : MITOSIS, false);
+    applyMode(b.dataset.mode);
   });
 });
 $("cStop").addEventListener("change",e=>{ stopAtStep=e.target.checked; });
@@ -1129,9 +1292,9 @@ $("foot").innerHTML = "모세포의 염색체 수는 2·4·8·16·46 중에서 �
   "적도면은 체세포 분열과 감수 2분열에서는 한 줄, 결합이 일어나는 감수 1분열에서만 두 줄입니다. "+
   "세포질이 잘록해지며 나뉘는 모습은 동물 세포 기준이며, 식물 세포에서는 가운데에 세포판이 생기며 나뉩니다. "+
   "감수 2분열의 딸세포 네 개는 교과서에서는 2×2로 그려져 있지만 여기서는 가로로 늘어놓았습니다."+
-  '<span class="rev">rev 13</span>';
+  '<span class="rev">rev 15</span>';
 
-applyScenario(MITOSIS, false);
+applyMode("mitosis");
 if(reduce) pause();
 })();
 </script>

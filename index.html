@@ -1492,8 +1492,10 @@ function blDraw(it){
     it.el.appendChild(el("line",{class:"bl-hit",x1:it.ax,y1:it.ay,x2:it.bx,y2:it.by}));
     it.el.appendChild(el("line",{class:"bl-fiber",x1:it.ax,y1:it.ay,x2:it.bx,y2:it.by}));
   } else {
-    /* 염색체류 — 붙어 있으면 짝의 몫까지 두 벌을 그린다 */
-    const offs = it.bond ? [-BL.SEPX*sc/2, BL.SEPX*sc/2] : [0];
+    /* 염색체류 — 붙어 있으면 짝의 몫까지 두 벌을 그린다.
+       side는 붙일 때 어느 쪽에서 다가왔는지로 정해진다 (+1이면 이 조각이 오른쪽). */
+    const h = BL.SEPX*sc/2, hs = (it.side===1) ? 1 : -1;
+    const offs = it.bond ? [hs*h, -hs*h] : [0];
     const mates = it.bond ? [it, blFind(it.bond)] : [it];
     offs.forEach((dx,n)=>{
       const m = mates[n] || it;
@@ -1574,6 +1576,10 @@ function blSnap(it){
   }
   if(best && bd < BL.SEPX*S*blSc(it)*3.0){
     best.sc = blSc(it);
+    /* 다가온 방향을 기억해 둔다 — 오른쪽에서 붙였으면 오른쪽에 남아야 한다 */
+    const hostRight = it.x > best.x;
+    it.side = hostRight ? 1 : -1;
+    best.side = hostRight ? -1 : 1;
     it.bond = best.id; best.bond = it.id;
     it.x = (it.x + best.x)/2; it.y = (it.y + best.y)/2;
     best.x = it.x; best.y = it.y;
@@ -1585,9 +1591,10 @@ function blSnap(it){
 function blUnbond(it){
   const p = it.bond ? blFind(it.bond) : null;
   if(!p) return;
+  const gap = BL.SEPX*S*blSc(it)*1.6, hs = (it.side===1) ? 1 : -1, cx = it.x;
   it.bond = null; p.bond = null; p.hid = false;
-  p.x = it.x + BL.SEPX*S*blSc(it)*1.8; p.y = it.y;
-  it.x = it.x - BL.SEPX*S*blSc(it)*0.6;
+  it.x = cx + hs*gap*0.5;               // 붙어 있던 좌우 자리를 그대로 지키며 벌어진다
+  p.x  = cx - hs*gap*0.5; p.y = it.y;
   blDraw(it); blDraw(p);
 }
 function blFeed(html, ok){
@@ -1729,7 +1736,7 @@ function blPoint(e){
    조각 목록을 통째로 찍어 두고 되돌린다. 바뀌기 '직전'에 찍는다. */
 function blSnapshot(){
   return BL.items.map(v=>({id:v.id,k:v.k,c:v.c,z:v.z,label:v.label,tool:v.tool,
-    x:v.x,y:v.y,ax:v.ax,ay:v.ay,bx:v.bx,by:v.by,sc:v.sc,bond:v.bond,hid:v.hid,a:v.a,ph:v.ph}));
+    x:v.x,y:v.y,ax:v.ax,ay:v.ay,bx:v.bx,by:v.by,sc:v.sc,bond:v.bond,hid:v.hid,side:v.side,a:v.a,ph:v.ph}));
 }
 function blMark(){
   BL.undo.push(blSnapshot());
@@ -2418,7 +2425,7 @@ $("foot").innerHTML = "모세포의 염색체 수는 2·4·8·16·46 중에서 �
   "적도면은 체세포 분열과 감수 2분열에서는 한 줄, 결합이 일어나는 감수 1분열에서만 두 줄입니다. "+
   "세포질이 잘록해지며 나뉘는 모습은 동물 세포 기준이며, 식물 세포에서는 가운데에 세포판이 생기며 나뉩니다. "+
   "감수 2분열의 딸세포 네 개는 교과서에서는 2×2로 그려져 있지만 여기서는 가로로 늘어놓았습니다."+
-  '<span class="rev">rev 27</span>';
+  '<span class="rev">rev 28</span>';
 
 blInit();
 applyMode("mitosis");

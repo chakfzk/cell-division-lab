@@ -8,6 +8,8 @@
   --bg-mit:#efe9f4;  --gr-mit:#f6f2f8;  --ac-mit:#8e3b7a;  --ac-mit-s:#f4e7f1;
   --bg-mei:#e2eaf6;  --gr-mei:#eff4fa;  --ac-mei:#2b5fa5;  --ac-mei-s:#e3ecf9;
   --bg-cmp:#fafafc;  --gr-cmp:#f4f4f8;  --ac-cmp:#4a5570;  --ac-cmp-s:#ebedf3;
+  --bg-qz:#eaf2ec;   --gr-qz:#f2f7f3;   --ac-qz:#2c7350;   --ac-qz-s:#e2f0e8;
+  --bg-bd:#f5eee2;   --gr-bd:#faf5ee;   --ac-bd:#8a5a1f;   --ac-bd-s:#f6ebdc;
   --ground:var(--gr-mit);
   --panel:#ffffff;
   --stage-bg:var(--bg-mit);
@@ -40,6 +42,9 @@
     --bg-mit:#191324; --gr-mit:#15101f; --ac-mit:#dd90c8; --ac-mit-s:#331f39;
     --bg-mei:#141e2e; --gr-mei:#0f1620; --ac-mei:#7fb3ec; --ac-mei-s:#16263d;
     --bg-cmp:#101016; --gr-cmp:#0b0b10; --ac-cmp:#9aa6c4; --ac-cmp-s:#232733;
+    --bg-qz:#121d18;  --gr-qz:#0d1611;  --ac-qz:#7fd0a4;  --ac-qz-s:#172c21;
+  --bg-bd:#1e1810;  --gr-bd:#16120c;  --ac-bd:#e0b072;  --ac-bd-s:#2e2416;
+    --bg-bd:#1e1810;  --gr-bd:#16120c;  --ac-bd:#e0b072;  --ac-bd-s:#2e2416;
     --panel:#1e1729;
     --ink:#f2ecf6; --ink-2:#c4b8ce; --muted:#93889f;
     --line:#302640; --line-strong:#463857;
@@ -55,6 +60,8 @@
   --bg-mit:#191324; --gr-mit:#15101f; --ac-mit:#dd90c8; --ac-mit-s:#331f39;
   --bg-mei:#141e2e; --gr-mei:#0f1620; --ac-mei:#7fb3ec; --ac-mei-s:#16263d;
   --bg-cmp:#101016; --gr-cmp:#0b0b10; --ac-cmp:#9aa6c4; --ac-cmp-s:#232733;
+  --bg-qz:#121d18;  --gr-qz:#0d1611;  --ac-qz:#7fd0a4;  --ac-qz-s:#172c21;
+  --bg-bd:#1e1810;  --gr-bd:#16120c;  --ac-bd:#e0b072;  --ac-bd-s:#2e2416;
   --panel:#1e1729;
   --ink:#f2ecf6; --ink-2:#c4b8ce; --muted:#93889f;
   --line:#302640; --line-strong:#463857;
@@ -70,6 +77,9 @@
    비교 모드는 어느 한쪽 색을 쓰면 다른 쪽이 곁다리로 보이므로 중립색을 쓴다. */
 :root[data-scen="meiosis"]{ --ground:var(--gr-mei); --stage-bg:var(--bg-mei); --accent:var(--ac-mei); --accent-soft:var(--ac-mei-s); }
 :root[data-scen="compare"]{ --ground:var(--gr-cmp); --stage-bg:var(--bg-cmp); --accent:var(--ac-cmp); --accent-soft:var(--ac-cmp-s); }
+/* 연습(단계 맞히기)은 초록 계열 — 보는 탭과 푸는 탭이 색으로 갈린다 */
+:root[data-scen="quiz"]{ --ground:var(--gr-qz); --stage-bg:var(--bg-qz); --accent:var(--ac-qz); --accent-soft:var(--ac-qz-s); }
+:root[data-scen="build"]{ --ground:var(--gr-bd); --stage-bg:var(--bg-bd); --accent:var(--ac-bd); --accent-soft:var(--ac-bd-s); }
 
 *{box-sizing:border-box}
 body{
@@ -87,13 +97,25 @@ header.top{
 h1{margin:0;font-size:clamp(24px,3.2vw,33px);line-height:1.15;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
 .sub{margin:6px 0 0;color:var(--ink-2);max-width:54ch;font-size:14px}
 .top-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.theme-btn{
-  border:1px solid var(--line-strong);background:var(--panel);color:var(--ink-2);
-  border-radius:999px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap;
+/* 해·달 토글 스위치 — 손잡이가 좌우로 미끄러진다 */
+.theme-sw{border:0;background:none;padding:0;cursor:pointer;display:inline-flex;border-radius:999px}
+.tsw-track{
+  position:relative;width:60px;height:30px;border-radius:999px;background:var(--panel);
+  border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:space-between;padding:0 7px;
 }
-.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tsw-track svg{width:15px;height:15px;color:var(--muted);position:relative;z-index:1}
+.tsw-knob{
+  position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+  background:var(--accent);transition:transform .18s ease;z-index:0;
+}
+.theme-sw[aria-checked="true"] .tsw-knob{transform:translateX(30px)}
+.theme-sw[aria-checked="false"] .tsw-sun{color:var(--accent-ink)}
+.theme-sw[aria-checked="true"] .tsw-moon{color:var(--accent-ink)}
+.theme-sw:hover .tsw-track{border-color:var(--accent)}
+.theme-sw:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* 모드 전환 — 두 분열을 오가는 것이 이 앱의 중심이므로 크게 둔다 */
+.modebar{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
 .modes{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-m);overflow:hidden}
 .modes button{
   border:0;background:var(--panel);color:var(--ink-2);font:inherit;font-size:14.5px;font-weight:700;
@@ -118,6 +140,25 @@ h1{margin:0;font-size:clamp(24px,3.2vw,33px);line-height:1.15;font-weight:800;le
 .clock{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;align-self:center}
 
 .stage{display:block;width:100%;height:auto;background:var(--stage-bg)}
+
+/* ── 무대 위 버튼 ── 평소엔 은은하게, 마우스를 올리면 또렷하게 */
+.stage-wrap{position:relative}
+.float-ctrl{position:absolute;right:14px;bottom:14px;display:flex;gap:8px}
+.fbtn{
+  width:46px;height:46px;border-radius:50%;display:grid;place-items:center;padding:0;
+  border:1px solid var(--line-strong);background:var(--panel);color:var(--accent);
+  opacity:.82;box-shadow:0 2px 8px rgba(20,10,30,.12);transition:opacity .15s ease, transform .15s ease;
+}
+.fbtn svg{width:18px;height:18px}
+.fbtn:hover,.fbtn:focus-visible{opacity:1;transform:scale(1.05)}
+.fbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fbtn.fplay{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fbtn.fplay path{fill:currentColor}
+.fbtn .i-pause,.fbtn.is-playing .i-play{display:none}
+.fbtn.is-playing .i-pause{display:inline}
+.fbtn .i-exit,.fbtn.is-fs .i-enter{display:none}
+.fbtn.is-fs .i-exit{display:inline}
+.fbtn[hidden]{display:none!important}
 
 /* ── 무대 그래픽 ──────────────────────────── */
 .cell{fill:url(#cytoGrad);stroke:var(--cyto-line);stroke-width:2.5}
@@ -189,15 +230,18 @@ button{font:inherit;cursor:pointer}
   width:100vw;height:100vh;border:0;border-radius:0;overflow:auto;
   display:flex;flex-direction:column;background:var(--panel);
 }
-.stage-card:fullscreen .stage{flex:1 1 0;min-height:0;width:100%}
+.stage-card:fullscreen .stage-wrap{flex:1 1 0;min-height:0}
+.stage-card:fullscreen .stage{width:100%;height:100%}
 .stage-card:fullscreen .ruler-note{display:none}
+.stage-card:fullscreen .fbtn{width:54px;height:54px}
 .stage-card:fullscreen .step-name{font-size:22px}
 .stage-card:fullscreen .step-line{font-size:16px}
 .stage-card:-webkit-full-screen{
   width:100vw;height:100vh;border:0;border-radius:0;overflow:auto;
   display:flex;flex-direction:column;background:var(--panel);
 }
-.stage-card:-webkit-full-screen .stage{flex:1 1 0;min-height:0;width:100%}
+.stage-card:-webkit-full-screen .stage-wrap{flex:1 1 0;min-height:0}
+.stage-card:-webkit-full-screen .stage{width:100%;height:100%}
 .stage-card:-webkit-full-screen .ruler-note{display:none}
 .check{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink-2);cursor:pointer;user-select:none;padding:4px 0}
 .check input{width:16px;height:16px;accent-color:var(--accent);margin:0}
@@ -290,8 +334,136 @@ kbd{
   border-radius:5px;padding:1px 5px;color:var(--ink-2);
 }
 .keys{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-2)}
+.legend{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--ink-2)}
+.legend b{color:var(--ink)}
 .keys li{display:flex;gap:9px;align-items:baseline}
 .keys span{flex:1}
+
+/* ── 염색체 배열 ─────────────────────────── */
+#buildLayer{display:none}
+#buildBar,#cardBuild{display:none}
+:root[data-scen="build"] #buildLayer{display:block}
+:root[data-scen="build"] #buildBar{display:block}
+:root[data-scen="build"] #cardBuild{display:block}
+:root[data-scen="build"] #scene,
+:root[data-scen="build"] #labelHost,
+:root[data-scen="build"] #rowBands,
+:root[data-scen="build"] #lens,
+:root[data-scen="build"] .stage-head,
+:root[data-scen="build"] .controls,
+:root[data-scen="build"] .tl-wrap,
+:root[data-scen="build"] .ruler-note,
+:root[data-scen="build"] .float-ctrl,
+:root[data-scen="build"] #cardObs,
+:root[data-scen="build"] #cardCount,
+:root[data-scen="build"] #cardThink,
+:root[data-scen="build"] #cardKeys{display:none}
+:root[data-scen="build"] .stage{touch-action:none}
+:root[data-scen="build"] #blTrash,
+:root[data-scen="build"] #blClearBtn{opacity:1}
+#buildTop{display:none;padding:13px 18px;border-bottom:1px solid var(--line);flex-direction:column;gap:10px}
+:root[data-scen="build"] #buildTop{display:flex}
+/* 선 그리기가 켜져 있을 때만 보이는 해제 단추 */
+#blLineOff{opacity:0;pointer-events:none;cursor:pointer}
+:root.bl-line #blLineOff{opacity:1;pointer-events:auto}
+#blLineOff rect{fill:var(--accent);stroke:none}
+#blLineOff text{font-family:var(--f-ui);font-size:13px;font-weight:800;fill:var(--accent-ink);text-anchor:middle}
+#blClearBtn{cursor:pointer}
+#blClearBtn rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1.5}
+#blClearBtn text{font-family:var(--f-ui);font-size:12px;font-weight:700;fill:var(--ink-2);text-anchor:middle}
+#blClearBtn:hover rect{border:0;stroke:var(--accent)}
+#blClearBtn:hover text{fill:var(--accent)}
+/* 크기 손잡이 — 모서리에 오면 대각선 화살표 커서 */
+.bl-h{fill:var(--panel);stroke:var(--accent);stroke-width:2}
+.bl-h.nw,.bl-h.se{cursor:nwse-resize}
+.bl-h.ne,.bl-h.sw{cursor:nesw-resize}
+.bl-h.end{cursor:move}
+:root[data-scen="build"].bl-line .stage{cursor:crosshair}
+#blTrash{color:var(--muted);pointer-events:none;transform-box:view-box;transform-origin:926px 68px}
+#blTrash.suck{animation:blSuck .32s ease}
+@keyframes blSuck{0%{transform:scale(1)}35%{transform:scale(.88)}100%{transform:scale(1)}}
+/* 블랙홀처럼 휴지통으로 빨려 들어가며 사라진다 */
+.bl-gone{transform-box:view-box;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#blTrash.suck{animation:none}}
+#blTrash rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1.5;stroke-dasharray:5 4}
+#blTrash text{font-family:var(--f-ui);font-size:12px;font-weight:700;fill:var(--muted);text-anchor:middle}
+#blTrash.hot{color:#c0504a}
+#blTrash.hot rect{fill:var(--accent-soft);stroke:#c0504a;stroke-dasharray:none;stroke-width:2.4}
+#blTrash.hot text{fill:#c0504a}
+/* 끌 수 있는 것에는 손잡이 커서 (자식 도형까지 확실히 적용) */
+#buildLayer [data-pid],#buildLayer [data-pid] *:not(.bl-h){cursor:grab}
+#buildLayer [data-pid] .bl-act,#buildLayer [data-pid] .bl-act *{cursor:pointer}
+.bl-act rect{fill:var(--panel);stroke:var(--accent);stroke-width:1.6}
+.bl-act text{font-family:var(--f-ui);font-size:12.5px;font-weight:800;fill:var(--accent);text-anchor:middle}
+.pitem{cursor:grab}
+:root[data-scen="build"].bl-dragging,
+:root[data-scen="build"].bl-dragging *{cursor:grabbing!important}
+.bl-ring{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;pointer-events:none}
+.bsz{min-width:44px;padding:9px 10px;font-size:16px;line-height:1}
+.bsize{flex:1 1 150px;max-width:230px;height:22px}
+
+.build{padding:14px 18px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:11px}
+.brow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bgoal{margin:0;font-size:14px;font-weight:700;color:var(--ink);padding:9px 12px;
+  background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 var(--r-s) var(--r-s) 0}
+.bgoal[hidden]{display:none}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.pitem{
+  border:1px solid var(--line-strong);background:var(--panel);border-radius:var(--r-m);
+  padding:5px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+}
+.pitem svg{width:100%;height:34px;display:block}
+.pitem span{font-size:10.5px;font-weight:700;color:var(--ink-2);line-height:1.25;text-align:center}
+.pitem[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent) inset}
+.pitem[aria-pressed="true"] span{color:var(--accent)}
+/* 안쪽을 눌러도 잡히도록 — 다만 선을 그릴 때만 통과시킨다 */
+.bl-cell{fill:url(#cytoGrad);stroke:var(--cyto-line);stroke-width:2.5;pointer-events:all}
+.bl-nuc{fill:var(--nuc);fill-opacity:.55;stroke:var(--nuc-line);stroke-width:2.2;pointer-events:all}
+:root.bl-line .bl-cell,:root.bl-line .bl-nuc{pointer-events:stroke}
+:root.bl-dragging #blClearBtn{opacity:.3}
+.bl-fiber{stroke:var(--spindle);stroke-width:1.5;fill:none;stroke-linecap:round}
+.bl-hit{stroke:transparent;stroke-width:26;fill:none}
+.bl-sel{outline:none}
+.bl-sel .bl-ring{stroke:var(--accent);stroke-width:2;fill:none;stroke-dasharray:4 4}
+
+/* ── 단계 맞히기 ─────────────────────────── */
+#quizBar,#cardScore{display:none}
+:root[data-scen="quiz"] #quizBar{display:block}
+:root[data-scen="quiz"] #cardScore{display:block}
+/* 정답이 드러나는 것들은 숨긴다 — 단계 이름·타임라인·이름표·염색체 수 */
+:root[data-scen="quiz"] .stage-head,
+:root[data-scen="quiz"] .controls,
+:root[data-scen="quiz"] .tl-wrap,
+:root[data-scen="quiz"] .ruler-note,
+:root[data-scen="quiz"] #cardObs,
+:root[data-scen="quiz"] #cardCount,
+:root[data-scen="quiz"] #cardThink,
+:root[data-scen="quiz"] #cardKeys{display:none}
+
+.quiz{padding:16px 18px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.qhint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+.qhint b{color:var(--ink-2)}
+.qsec{display:flex;flex-direction:column;gap:8px}
+.qsec[hidden]{display:none}
+.qprompt{margin:0;font-size:15px;font-weight:800;color:var(--ink);text-wrap:balance}
+.qopts button.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.qopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:8px}
+.qopts button{
+  border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);
+  border-radius:var(--r-m);padding:11px 10px;font-size:14px;font-weight:700;min-height:46px;text-align:center;
+}
+.qopts button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.qopts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qopts button:disabled{cursor:default;opacity:.55}
+.qopts button.right{background:var(--ac-qz-s);border-color:var(--ac-qz);color:var(--ac-qz);opacity:1}
+.qopts button.wrong{background:#f6e3e3;border-color:#c0504a;color:#a8433d;opacity:1}
+:root[data-theme="dark"] .qopts button.wrong{background:#3a2020;border-color:#e08a84;color:#f0a49e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .qopts button.wrong{background:#3a2020;border-color:#e08a84;color:#f0a49e}}
+.qfeed{margin:0;font-size:14px;color:var(--ink-2);min-height:1.6em}
+.qfeed[hidden]{display:none}
+.qfeed b{color:var(--ink)}
+.qfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qscore{font-size:13.5px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
 
 footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 .rev{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:99px;border:1px solid var(--line-strong);font-size:11px;letter-spacing:.04em}
@@ -306,12 +478,24 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
       <p class="sub" id="sub"></p>
     </div>
     <div class="top-right">
+      <button class="theme-sw" id="themeBtn" type="button" role="switch" aria-checked="false" aria-label="어두운 화면">
+        <span class="tsw-track">
+          <span class="tsw-knob"></span>
+          <svg class="tsw-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M10 1.8v2.1M10 16.1v2.1M1.8 10h2.1M16.1 10h2.1M4.2 4.2l1.5 1.5M14.3 14.3l1.5 1.5M15.8 4.2l-1.5 1.5M5.7 14.3l-1.5 1.5"/></g></svg>
+          <svg class="tsw-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 12.6A7 7 0 0 1 7.4 3.5a7 7 0 1 0 9.1 9.1z" fill="currentColor"/></svg>
+        </span>
+      </button>
+      <div class="modebar">
       <div class="modes" id="modes" role="group" aria-label="분열 종류">
         <button type="button" data-mode="mitosis" aria-pressed="true">체세포 분열</button>
         <button type="button" data-mode="meiosis" aria-pressed="false">감수 분열</button>
         <button type="button" data-mode="compare" aria-pressed="false">나란히 비교</button>
       </div>
-      <button class="theme-btn" id="themeBtn" type="button">화면 밝기 바꾸기</button>
+      <div class="modes" id="modes2" role="group" aria-label="연습">
+        <button type="button" data-mode="quiz" aria-pressed="false">단계 맞히기</button>
+        <button type="button" data-mode="build" aria-pressed="false">염색체 배열</button>
+      </div>
+      </div>
     </div>
   </header>
 
@@ -324,6 +508,21 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         <span class="clock" id="clock"></span>
       </div>
 
+      <!-- 만들 단계는 작업판 바로 위에 — 팔레트와 캔버스 사이에 끼면 흐름이 끊긴다 -->
+      <div class="build-top" id="buildTop">
+        <div class="brow">
+          <span class="fieldlabel">만들 단계</span>
+          <div class="seg" id="bDivSeg" role="group" aria-label="분열 종류">
+            <button type="button" data-bd="free" aria-pressed="true">자유 배치</button>
+            <button type="button" data-bd="mitosis" aria-pressed="false">체세포 분열</button>
+            <button type="button" data-bd="meiosis" aria-pressed="false">감수 분열</button>
+          </div>
+          <div class="seg" id="bStepSeg" role="group" aria-label="단계"></div>
+        </div>
+        <p class="bgoal" id="bGoal"></p>
+      </div>
+
+      <div class="stage-wrap">
       <svg class="stage" id="stage" viewBox="0 0 1000 620" role="img" aria-label="세포 분열 과정 애니메이션">
         <defs>
           <radialGradient id="cytoGrad" cx="42%" cy="34%" r="78%">
@@ -339,6 +538,25 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
           <text class="bandtag" x="26" y="78">체세포 분열</text>
           <text class="bandtag" x="26" y="365">감수 분열</text>
         </g>
+        <!-- 염색체 배열 탭의 작업판 -->
+        <g id="buildLayer"></g>
+        <g id="blTrash" opacity="0">
+          <rect x="872" y="14" width="108" height="108" rx="18"></rect>
+          <g transform="translate(926,58) scale(1.35)" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M-13-8h26M-9-8l1.6 20a2 2 0 0 0 2 1.8h10.8a2 2 0 0 0 2-1.8L9-8M-4-8v-3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3M-3-3v13M3-3v13"/>
+          </g>
+          <text x="926" y="110">버리기</text>
+        </g>
+        <g id="blClearBtn" data-blbtn="clear" opacity="0">
+          <rect x="872" y="130" width="108" height="30" rx="9"></rect>
+          <text x="926" y="150">전체 지우기</text>
+        </g>
+        <g id="blLineOff" data-blbtn="lineoff">
+          <rect x="20" y="16" width="186" height="36" rx="11"></rect>
+          <text x="113" y="39">✕　선 그리기 끄기</text>
+        </g>
+        <!-- 끄는 동안의 조각은 여기로 옮겨 휴지통보다 위에 그린다 (뒤로 숨지 않도록) -->
+        <g id="blFront"></g>
         <g id="scene"></g>
         <!-- 이름표는 #scene 밖에 둔다 — 돋보기가 글자까지 확대하면 오히려 읽기 어렵다 -->
         <g id="labelHost"></g>
@@ -349,6 +567,22 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
           <circle id="lensRing" r="1"></circle>
         </g>
       </svg>
+      <!-- 무대 위에 떠 있는 버튼 — 전체 화면에서 조작부가 멀어져도 바로 누를 수 있게 -->
+      <div class="float-ctrl">
+        <button class="fbtn fplay" id="fPlay" type="button" aria-label="재생">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path class="i-play" d="M5 3.2v9.6l7.8-4.8z"/>
+            <path class="i-pause" d="M4.3 3h2.7v10H4.3zM9 3h2.7v10H9z"/>
+          </svg>
+        </button>
+        <button class="fbtn" id="fFs" type="button" aria-label="전체 화면">
+          <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path class="i-enter" d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/>
+            <path class="i-exit" d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/>
+          </svg>
+        </button>
+      </div>
+      </div>
 
       <div class="controls">
         <input class="scrub" id="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="분열 진행 시간">
@@ -392,12 +626,47 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         <p class="warn" id="nWarn" hidden></p>
       </div>
 
+      <!-- ── 염색체 배열 ── 조각을 끌어다 놓아 단계를 직접 만들어 본다 -->
+      <div class="build" id="buildBar">
+        <div class="palette" id="palette"></div>
+        <p class="qhint">팔레트의 조각을 <b>작업판으로 끌어다 놓으세요.</b> 놓인 조각도 끌어서 옮기고, 오른쪽 위 <b>휴지통에 겹쳐 놓고 손을 떼면</b> 빨려 들어가며 지워집니다. 조각을 누르면 <b>모서리에 손잡이</b>가 생겨 크기를 바꿀 수 있습니다. 빨강·파랑 X자를 가까이 가져가면 <b>자석처럼 붙어</b> 이가염색체가 됩니다. 붙은 것을 누르면 위에 <b>분리</b> 단추가 뜹니다(두 번 눌러도 떨어집니다). <b>선 그리기</b>를 켜면 작업판을 끌어 방추사를 그립니다(켜져 있는 동안 작업판 왼쪽 위에 끄기 단추가 뜹니다). 잘못했을 때는 <b>실행 취소</b>를 누르세요.</p>
+        <div class="brow">
+          <button class="btn" id="bUndo" type="button" disabled>↶ 실행 취소</button>
+          <button class="btn" id="bRedo" type="button" disabled>↷ 다시 실행</button>
+          <span class="spacer"></span>
+          <button class="btn play" id="bCheck" type="button">검사</button>
+        </div>
+        <p class="qfeed" id="bFeed" hidden></p>
+      </div>
+
+      <!-- ── 단계 맞히기 ── 그림만 보고 어느 분열의 어느 단계인지 고른다 -->
+      <div class="quiz" id="quizBar">
+        <p class="qhint">그림은 그 단계를 <b>반복해서</b> 보여 줍니다. 시작과 끝을 다 봐야 어느 시기인지 알 수 있습니다. 무대 오른쪽 아래 버튼으로 멈출 수 있습니다.</p>
+        <div class="qsec">
+          <p class="qprompt">① 어느 분열인가요?</p>
+          <div class="qopts" id="qOptsDiv"></div>
+        </div>
+        <div class="qsec" id="qSecStep">
+          <p class="qprompt">② 어느 단계인가요?</p>
+          <div class="qopts" id="qOptsStep"></div>
+        </div>
+        <p class="qfeed" id="qFeed"></p>
+        <div class="qfoot">
+          <span class="qscore" id="qScore"></span>
+          <span class="spacer"></span>
+          <button class="btn" id="qReset" type="button">처음부터 다시</button>
+          <button class="btn play" id="qCheck" type="button">확인</button>
+          <button class="btn play" id="qNext" type="button">다음 문제 ▶</button>
+          <button class="btn play" id="qRestart" type="button">새로 10문제 ▶</button>
+        </div>
+      </div>
+
       <div class="tl-wrap"><ol class="timeline" id="timeline"></ol></div>
       <p class="ruler-note">위 슬라이더와 아래 칸의 <b>가로 길이가 곧 걸리는 시간</b>입니다. 슬라이더는 일정한 속도로 흐르므로, 칸이 넓은 <b>분열 전이 가장 오래</b> 걸립니다.</p>
     </section>
 
     <aside class="side">
-      <div class="card">
+      <div class="card" id="cardObs">
         <h2>지금 세포에서</h2>
         <p id="obs"></p>
         <div id="obsCmp" hidden>
@@ -407,7 +676,7 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="cardCount">
         <h2>수 세어 보기</h2>
         <div class="tiles" id="tiles">
           <div class="tile"><span class="k">세포 수</span><span class="v" id="vCell">1</span><span class="u">개</span></div>
@@ -425,7 +694,7 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         <p class="note" id="cntNote"></p>
       </div>
 
-      <div class="card">
+      <div class="card" id="cardThink">
         <div class="q">
           <span class="who">생각해 보기</span>
           <p id="qText"></p>
@@ -434,7 +703,7 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
         <p id="answer" hidden></p>
       </div>
 
-      <div class="card">
+      <div class="card" id="cardKeys">
         <h2>단축키</h2>
         <ul class="keys">
           <li><kbd>Space</kbd><span>재생 / 멈춤</span></li>
@@ -445,6 +714,28 @@ footer{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid 
           <li><kbd>F</kbd><span>전체 화면 (끝낼 때는 <kbd>Esc</kbd>)</span></li>
           <li><kbd>마우스</kbd><span>무대 위에 올리면 돋보기</span></li>
         </ul>
+      </div>
+      <div class="card" id="cardBuild">
+        <h2>조각 설명</h2>
+        <ul class="legend">
+          <li><b>세포막</b> — 세포 하나의 테두리. 세포질 분열이 끝난 단계라면 여러 개를 놓습니다.</li>
+          <li><b>핵막</b> — 핵을 둘러싼 막. 전기에 사라지고 말기에 다시 생깁니다.</li>
+          <li><b>실 모양 염색체</b> — 풀어져 있는 상태. 분열 전과 말기에 나옵니다.</li>
+          <li><b>X자 염색체</b> — 복제되어 염색 분체 두 가닥이 붙어 있는 상태.</li>
+          <li><b>염색 분체 한 가닥</b> — X자가 갈라진 뒤의 낱개. 후기에 극으로 끌려갑니다.</li>
+          <li><b>선 그리기</b> — 켜고 작업판을 끌면 선이 그려집니다. 방추사를 직접 그릴 때 씁니다.</li>
+        </ul>
+        <p class="note">색은 <b>부모 중 어느 쪽에서 왔는지</b>, 길이는 <b>염색체의 종류</b>를 뜻합니다. 그래서 상동 염색체는 길이가 같고 색이 다른 짝입니다.</p>
+      </div>
+
+      <div class="card" id="cardScore">
+        <h2>점수</h2>
+        <div class="tiles">
+          <div class="tile hold"><span class="k">맞힌 문제</span><span class="v" id="sRight">0</span><span class="u">개</span></div>
+          <div class="tile"><span class="k">푼 문제</span><span class="v" id="sTotal">0</span><span class="u">개</span></div>
+          <div class="tile"><span class="k">남은 문제</span><span class="v" id="sLeft">10</span><span class="u">개</span></div>
+        </div>
+        <p class="note" id="sNote">분열 종류와 단계를 <b>둘 다</b> 맞혀야 정답으로 셉니다. 분열 전 시기는 두 분열이 똑같이 생겨서 문제로 내지 않습니다.</p>
       </div>
     </aside>
   </div>
@@ -989,17 +1280,705 @@ const COMPARE = {
   ]
 };
 
+/* ───────── 단계 맞히기 ─────────
+   각 단계의 '완성된 모습'은 그 단계가 끝나는 지점, 즉 t = 단계번호+1 에 있다.
+   분열 전 시기는 두 분열이 똑같이 생겨서 문제로 내지 않는다. */
+const QUIZ = {
+  pool: [
+    {m:"mitosis", s:1, cue:"핵막이 없고 X자 염색체가 <b>흩어져</b> 있습니다. 상동 염색체가 짝을 짓지 않았으면 체세포 분열입니다."},
+    {m:"mitosis", s:2, cue:"적도면에 <b>한 줄</b>로 섰습니다. 두 줄이 아니라 한 줄이면 체세포 분열의 중기입니다."},
+    {m:"mitosis", s:3, cue:"X자가 갈라져 <b>낱개의 염색 분체</b>가 양극으로 갑니다. 세포는 아직 하나입니다."},
+    {m:"mitosis", s:4, cue:"세포질이 나뉘는 중이고 염색체가 다시 <b>풀어지고</b> 있습니다."},
+    {m:"mitosis", s:5, cue:"세포 두 개, 염색체는 실처럼 풀어져 있습니다. 감수 말기 Ⅰ은 두 세포 안에 <b>X자가 그대로</b> 남아 있어서 다릅니다."},
+    {m:"meiosis", s:1, cue:"상동 염색체가 <b>짝을 지어 붙어</b> 있습니다. 결합이 보이면 감수 1분열입니다."},
+    {m:"meiosis", s:2, cue:"적도면에 <b>두 줄</b>로 섰습니다. 두 줄이면 감수 1분열 중기입니다."},
+    {m:"meiosis", s:3, cue:"X자가 <b>갈라지지 않은 채</b> 통째로 양극으로 갑니다. 갈라지는 것은 상동 염색체입니다."},
+    {m:"meiosis", s:4, cue:"세포 두 개가 되었는데 염색체가 <b>X자 그대로</b>입니다. 풀어지지 않은 것이 표시입니다."},
+    {m:"meiosis", s:5, cue:"<b>세포 두 개</b>에서 동시에 분열이 시작됩니다. 세포가 둘이면 2분열입니다."},
+    {m:"meiosis", s:6, cue:"두 세포가 <b>각자 한 줄</b>로 배열했습니다. 세포가 둘이라는 점이 체세포 중기와 다릅니다."},
+    {m:"meiosis", s:7, cue:"<b>두 세포에서</b> 염색 분체가 갈라집니다."},
+    {m:"meiosis", s:8, cue:"세포가 <b>넷</b>으로 나뉘고 있습니다."},
+    {m:"meiosis", s:9, cue:"딸세포 <b>네 개</b>가 완성되었습니다."}
+  ],
+  i:-1, pickDiv:null, pickStep:null, done:false, right:0, total:0,
+  order:[], n:0, LEN:10
+};
+/* 한 세트 10문제 — 겹치지 않게 섞어서 뽑는다 */
+function quizDeal(){
+  const idx = QUIZ.pool.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const s=idx[i]; idx[i]=idx[j]; idx[j]=s; }
+  QUIZ.order = idx.slice(0, QUIZ.LEN);
+  QUIZ.n = 0; QUIZ.right = 0; QUIZ.total = 0;
+}
+const DIVNAME = {mitosis:"체세포 분열", meiosis:"감수 분열"};
+function quizScenario(key){ return (key || QUIZ.pool[QUIZ.i].m)==="mitosis" ? MITOSIS : MEIOSIS; }
+
+function quizNew(){
+  if(QUIZ.n >= QUIZ.order.length){ quizFinish(); return; }
+  const k = QUIZ.order[QUIZ.n];
+  QUIZ.i = k; QUIZ.pickDiv = null; QUIZ.pickStep = null; QUIZ.done = false;
+  const q = QUIZ.pool[k], sc = quizScenario();
+  rendA.setScenario(sc); rendA.setN(4); rendA.place(CX,CY,1); rendA.show(true); rendB.show(false);
+  /* 그 단계 구간을 반복 재생한다 — 정지 화면으로는 '말기'와 '딸세포 형성'을 구분할 수 없다 */
+  DUR = sc.dur.slice();
+  CUM = [0]; for(let i=0;i<DUR.length;i++) CUM.push(CUM[i]+DUR[i]);
+  TOTAL = CUM[DUR.length]; T_END = DUR.length;
+  loopMode = "step";
+  showFinished = false;
+  pause(); setT(q.s); play();
+  quizRender();
+}
+/* 10문제를 다 풀었을 때 */
+function quizFinish(){
+  pause();
+  const pct = Math.round(QUIZ.right/QUIZ.LEN*100);
+  $("qSecStep").hidden = true;
+  $("qOptsDiv").innerHTML = "";
+  $("qCheck").hidden = true; $("qNext").hidden = true;
+  $("qFeed").hidden = false;
+  $("qFeed").innerHTML = "<b>"+QUIZ.LEN+"문제를 다 풀었습니다.</b> "+QUIZ.right+"문제를 맞혔습니다 ("+pct+"점). "+
+    (pct===100 ? "완벽합니다." : pct>=70 ? "두 분열의 차이를 잘 구분하고 있습니다." : "중기가 한 줄인지 두 줄인지, 갈라지는 것이 무엇인지를 다시 살펴보세요.");
+  $("qScore").textContent = "맞힌 문제 "+QUIZ.right+" / "+QUIZ.LEN;
+  $("sRight").textContent = QUIZ.right; $("sTotal").textContent = QUIZ.LEN;
+  $("sLeft").textContent = 0;
+  $("qRestart").hidden = false;
+}
+function quizRender(){
+  const q = QUIZ.pool[QUIZ.i];
+  const left = QUIZ.order.length - QUIZ.n - (QUIZ.done ? 1 : 0);
+  $("qScore").textContent = "맞힌 문제 "+QUIZ.right+" / 푼 문제 "+QUIZ.total+" · 남은 문제 "+left+"개";
+  $("sRight").textContent = QUIZ.right; $("sTotal").textContent = QUIZ.total; $("sLeft").textContent = left;
+  $("qRestart").hidden = true;
+  $("qNext").hidden = !QUIZ.done;
+  if(QUIZ.done) $("qNext").textContent = (QUIZ.n+1 >= QUIZ.order.length) ? "결과 보기 ▶" : "다음 문제 ▶";
+  $("qCheck").hidden = QUIZ.done;
+  $("qCheck").disabled = (QUIZ.pickDiv===null || QUIZ.pickStep===null);
+  $("qSecStep").hidden = (QUIZ.pickDiv===null);
+  $("qFeed").hidden = !QUIZ.done;
+
+  const dv = $("qOptsDiv"); dv.innerHTML = "";
+  ["mitosis","meiosis"].forEach(key=>{
+    const b=document.createElement("button"); b.type="button"; b.textContent=DIVNAME[key];
+    if(QUIZ.done){
+      b.disabled = true;
+      if(key===q.m) b.classList.add("right");
+      else if(key===QUIZ.pickDiv) b.classList.add("wrong");
+    } else {
+      if(key===QUIZ.pickDiv) b.classList.add("sel");
+      b.addEventListener("click",()=>{
+        if(QUIZ.pickDiv!==key){ QUIZ.pickDiv = key; QUIZ.pickStep = null; }
+        quizRender();
+      });
+    }
+    dv.appendChild(b);
+  });
+
+  const sv = $("qOptsStep"); sv.innerHTML = "";
+  if(QUIZ.pickDiv===null) return;
+  /* 단계 목록은 '고른 분열'의 것으로 보여 준다. 분열을 바꾸면 목록도 함께 바뀐다 */
+  const listSc = QUIZ.done ? quizScenario() : quizScenario(QUIZ.pickDiv);
+  listSc.steps.forEach((st,idx)=>{
+    const b=document.createElement("button"); b.type="button"; b.textContent=st.short||st.name;
+    if(QUIZ.done){
+      b.disabled = true;
+      if(idx===q.s) b.classList.add("right");
+      else if(idx===QUIZ.pickStep && QUIZ.pickDiv===q.m) b.classList.add("wrong");
+    } else {
+      if(idx===QUIZ.pickStep) b.classList.add("sel");
+      b.addEventListener("click",()=>{ QUIZ.pickStep = idx; quizRender(); });
+    }
+    sv.appendChild(b);
+  });
+}
+function quizCheck(){
+  if(QUIZ.pickDiv===null || QUIZ.pickStep===null) return;
+  const q = QUIZ.pool[QUIZ.i], sc = quizScenario();
+  const ok = (QUIZ.pickDiv===q.m) && (QUIZ.pickStep===q.s);
+  QUIZ.total++; if(ok) QUIZ.right++;
+  QUIZ.done = true;
+  quizRender();
+  const f = $("qFeed"); f.hidden = false;
+  const name = DIVNAME[q.m] + " " + sc.steps[q.s].name;
+  f.innerHTML = (ok ? "정답입니다 — <b>" : "정답은 <b>") + name + "</b>. " + q.cue;
+}
+$("qCheck").addEventListener("click", quizCheck);
+$("qNext").addEventListener("click", ()=>{ QUIZ.n++; quizNew(); });
+$("qRestart").addEventListener("click", ()=>{ quizDeal(); quizNew(); });
+$("qReset").addEventListener("click", ()=>{ quizDeal(); quizNew(); });
+
+/* ═════════ 염색체 배열 ═════════
+   조각을 골라 작업판에 놓고, 끌어서 옮기고, 검사 버튼으로 맞는지 확인한다.
+   그림은 관찰 탭과 같은 chrPointAt/chrPath를 쓰므로 모양이 정확히 같다. */
+const BL = {
+  R:0.92, NUC:0.50, LEN_L:0.40, LEN_S:0.30,
+  TH:0.045, TW:0.016, SEPX:0.13, SEPI:0.030, AMP:0.055,
+  layer:null, items:[], seq:0, sel:null, div:"free", step:0,
+  drag:null, grip:null, lineTool:false, lineDraw:null, undo:[], redo:[]
+};
+/* 팔레트에 놓을 조각들 */
+const BL_KINDS = [
+  {k:"cell",  label:"세포막"},
+  {k:"nuc",   label:"핵막"},
+  {k:"thread",c:"red", z:"L", label:"실 긴 빨강"},
+  {k:"thread",c:"blue",z:"L", label:"실 긴 파랑"},
+  {k:"thread",c:"red", z:"S", label:"실 짧은 빨강"},
+  {k:"thread",c:"blue",z:"S", label:"실 짧은 파랑"},
+  {k:"x",     c:"red", z:"L", label:"X자 긴 빨강"},
+  {k:"x",     c:"blue",z:"L", label:"X자 긴 파랑"},
+  {k:"x",     c:"red", z:"S", label:"X자 짧은 빨강"},
+  {k:"x",     c:"blue",z:"S", label:"X자 짧은 파랑"},
+  {k:"one",   c:"red", z:"L", label:"분체 긴 빨강"},
+  {k:"one",   c:"blue",z:"L", label:"분체 긴 파랑"},
+  {k:"one",   c:"red", z:"S", label:"분체 짧은 빨강"},
+  {k:"one",   c:"blue",z:"S", label:"분체 짧은 파랑"},
+  {k:"line", tool:true, label:"선 그리기"}
+];
+/* 단계별 정답. need = [조각, 개수, 놓일 자리] */
+const BL_SPEC = {
+  mitosis:[
+    {cells:1,nuc:1,spindle:0,need:[["thread",4,"nucleus"]],goal:"핵막 안에 실 모양 염색체 4개를 넣으세요."},
+    {cells:1,nuc:0,spindle:1,need:[["x",4,"in"]],goal:"핵막을 없애고 X자 염색체 4개를 세포 안에 흩어 놓으세요. 방추사도 필요합니다."},
+    {cells:1,nuc:0,spindle:1,need:[["x",4,"plate"]],goal:"X자 염색체 4개를 적도면(세포 가운데)에 한 줄로 세우세요."},
+    {cells:1,nuc:0,spindle:1,need:[["one",8,"pole"]],goal:"X자가 갈라졌습니다. 낱개 염색 분체 8개를 양극에 4개씩 보내세요."},
+    {cells:2,nuc:2,spindle:0,need:[["thread",8,"in"]],goal:"세포막 2개와 핵막 2개를 만들고, 풀어진 염색체 8개를 나누어 놓으세요."},
+    {cells:2,nuc:2,spindle:0,need:[["thread",8,"nucleus"]],goal:"딸세포 2개 완성 — 각 핵막 안에 실 모양 염색체 4개씩 넣으세요."}
+  ],
+  meiosis:[
+    {cells:1,nuc:1,spindle:0,need:[["thread",4,"nucleus"]],goal:"핵막 안에 실 모양 염색체 4개를 넣으세요."},
+    {cells:1,nuc:0,spindle:1,need:[["biv",2,"in"]],goal:"X자 염색체로 상동 염색체 짝을 만드세요. 길이가 같고 색이 다른 둘을 가까이 가져가면 붙습니다."},
+    {cells:1,nuc:0,spindle:1,need:[["biv",2,"plate"]],goal:"결합한 상동 염색체 2쌍을 적도면에 세우세요. 두 줄로 보이는 것이 맞습니다."},
+    {cells:1,nuc:0,spindle:1,need:[["x",4,"pole"]],goal:"상동 염색체가 갈라집니다. X자 그대로 양극에 2개씩 보내세요."},
+    {cells:2,nuc:2,spindle:0,need:[["x",4,"in"]],goal:"세포 2개로 나뉘었습니다. 각 세포에 X자 염색체 2개씩 — 아직 풀어지지 않습니다."},
+    {cells:2,nuc:0,spindle:1,need:[["x",4,"in"]],goal:"두 세포에서 핵막이 다시 사라집니다. 복제는 없습니다."},
+    {cells:2,nuc:0,spindle:1,need:[["x",4,"plate"]],goal:"두 세포가 각자 적도면에 한 줄로 세웁니다."},
+    {cells:2,nuc:0,spindle:1,need:[["one",8,"pole"]],goal:"이번에는 염색 분체가 갈라집니다. 각 세포의 양극으로 보내세요."},
+    {cells:4,nuc:4,spindle:0,need:[["thread",8,"in"]],goal:"세포 4개와 핵막 4개를 만들고 염색체를 나누어 놓으세요."},
+    {cells:4,nuc:4,spindle:0,need:[["thread",8,"nucleus"]],goal:"생식세포 4개 완성 — 각 핵막 안에 염색체 2개씩 넣으세요."}
+  ]
+};
+const BL_NAME = {cell:"세포막",nuc:"핵막",thread:"실 모양 염색체",x:"X자 염색체",one:"염색 분체 한 가닥",biv:"결합한 상동 염색체",spindle:"방추사"};
+const BL_ZONE = {"in":"세포 안","plate":"적도면(세포 가운데)","pole":"양극(세포 양쪽 끝)","nucleus":"핵막 안"};
+
+function blLen(z){ return z==="S" ? BL.LEN_S : BL.LEN_L; }
+function blSc(it){ return it.sc || 1; }
+function blCellR(it){ return BL.R*S*blSc(it); }
+/* 고른 조각을 감싸는 네모 — 이 네 모서리에 크기 손잡이가 붙는다 */
+function blBox(it){
+  const sc = blSc(it);
+  if(it.k==="cell"){ const r=BL.R*S*sc; return {w:2*r,h:2*r}; }
+  if(it.k==="nuc"){  const r=BL.NUC*S*sc; return {w:2*r,h:2*r}; }
+  if(it.k==="thread"){ const d=blLen(it.z)*1.35*S*sc; return {w:d,h:d}; }
+  const h = blLen(it.z)*S*sc + BL.TH*S*sc;
+  const w = (it.bond?BL.SEPX*2:BL.SEPX)*S*sc + BL.TH*S*sc;
+  return {w:Math.max(w,28), h:Math.max(h,28)};
+}
+/* 조각 하나를 그리는 데 쓸 상태 — 관찰 탭과 같은 필드를 채운다 */
+function blState(it, dx, sc){
+  const L = blLen(it.z)*sc;
+  const base = Object.assign({}, DEF, {
+    x:(it.x-CX)/S + (dx||0), y:(it.y-CY)/S, ang:90, flip:1, sepRef:BL.SEPX*sc, phase:it.ph||0
+  });
+  if(it.k==="thread") return Object.assign(base,{ang:it.a||20,len:L*1.5,amp:BL.AMP*sc,freq:3.2,thick:BL.TW*sc,sep:BL.SEPI*sc,xs:0});
+  if(it.k==="x")      return Object.assign(base,{len:L,amp:0,thick:BL.TH*sc,sep:BL.SEPX*sc,xs:1});
+  return                     Object.assign(base,{len:L,amp:0,thick:BL.TH*sc,sep:0,xs:1,bend:L*0.18}); // one
+}
+function blDraw(it){
+  const g = {r:1,dx1:0,dx2:0}, sc = blSc(it);
+  while(it.el.firstChild) it.el.removeChild(it.el.firstChild);
+  it.el.setAttribute("opacity", it.hid ? "0" : "1");
+  if(it.k==="cell"){ it.el.appendChild(el("circle",{class:"bl-cell",cx:it.x,cy:it.y,r:BL.R*S*sc})); }
+  else if(it.k==="nuc"){ it.el.appendChild(el("circle",{class:"bl-nuc",cx:it.x,cy:it.y,r:BL.NUC*S*sc})); }
+  else if(it.k==="line"){
+    it.el.appendChild(el("line",{class:"bl-hit",x1:it.ax,y1:it.ay,x2:it.bx,y2:it.by}));
+    it.el.appendChild(el("line",{class:"bl-fiber",x1:it.ax,y1:it.ay,x2:it.bx,y2:it.by}));
+  } else {
+    /* 염색체류 — 붙어 있으면 짝의 몫까지 두 벌을 그린다 */
+    const offs = it.bond ? [-BL.SEPX*sc/2, BL.SEPX*sc/2] : [0];
+    const mates = it.bond ? [it, blFind(it.bond)] : [it];
+    offs.forEach((dx,n)=>{
+      const m = mates[n] || it;
+      const st = blState(Object.assign({}, m, {x:it.x, y:it.y}), dx, sc);
+      const ks = (m.k==="one") ? [0] : [0,1];
+      ks.forEach(k=>{
+        const d = chrPath(st,k,g,1);
+        it.el.appendChild(el("path",{class:"bl-hit",d:d}));
+        it.el.appendChild(el("path",{class:"chr "+m.c+(k?" k1":""),d:d,"stroke-width":(st.thick*S).toFixed(2)}));
+      });
+    });
+  }
+  if(BL.sel!==it) return;
+  if(it.k==="line"){
+    [["a",it.ax,it.ay],["b",it.bx,it.by]].forEach(h=>{
+      it.el.appendChild(el("rect",{class:"bl-h end","data-h":h[0],x:h[1]-7,y:h[2]-7,width:14,height:14,rx:4}));
+    });
+    return;
+  }
+  const bx = blBox(it);
+  it.el.appendChild(el("rect",{class:"bl-ring",x:it.x-bx.w/2,y:it.y-bx.h/2,width:bx.w,height:bx.h,rx:8}));
+  [["nw",-1,-1],["ne",1,-1],["se",1,1],["sw",-1,1]].forEach(c=>{
+    it.el.appendChild(el("rect",{class:"bl-h "+c[0],"data-h":c[0],
+      x:it.x+c[1]*bx.w/2-7, y:it.y+c[2]*bx.h/2-7, width:14, height:14, rx:4}));
+  });
+  /* 붙어 있는 상동 염색체에는 떼는 단추를 띄운다 */
+  if(it.bond){
+    const by = it.y - bx.h/2 - 24;
+    const g2 = el("g",{class:"bl-act","data-act":"split"});
+    g2.appendChild(el("rect",{x:it.x-28,y:by-13,width:56,height:26,rx:9}));
+    const tx = el("text",{x:it.x,y:by+5}); tx.textContent = "분리";
+    g2.appendChild(tx);
+    it.el.appendChild(g2);
+  }
+}
+function blFind(id){ return BL.items.find(v=>v.id===id) || null; }
+function blAdd(kind, x, y){
+  const it = Object.assign({}, kind, {id:++BL.seq, x:x, y:y, bond:null, sc:1,
+    a: 15 + (BL.seq*37)%130, ph:(BL.seq*1.7)%6.283});
+  it.el = el("g",{"data-pid":it.id});
+  BL.layer.appendChild(it.el);
+  BL.items.push(it);
+  blDraw(it);
+  return it;
+}
+function blRemove(it){
+  if(it.bond){ const p = blFind(it.bond); if(p){ p.bond = null; p.hid = false; blDraw(p); } }
+  if(BL.sel===it) BL.sel = null;
+  it.el.remove();
+  BL.items = BL.items.filter(v=>v!==it);
+}
+function blClear(){ blMark(); blSelect(null); BL.items.slice().forEach(blDrop); BL.seq = 0; blFeed(""); }
+function blSelect(it){
+  const prev = BL.sel;
+  BL.sel = it || null;
+  if(prev && prev!==it) blDraw(prev);
+  if(it) blDraw(it);
+}
+function blResize(it, v){
+  it.sc = Math.round(clamp(v,0.4,2.5)*50)/50;
+  const mate = it.bond ? blFind(it.bond) : null;
+  if(mate) mate.sc = it.sc;            // 붙어 있는 짝은 같은 크기를 유지한다
+  blDraw(it);
+}
+/* 세포막·방추사는 아래에, 염색체는 위에 오도록 다시 쌓는다 */
+function blRestack(){
+  const order = {cell:0, line:1, nuc:2, thread:3, x:3, one:3};
+  BL.items.slice().sort((a,b)=>order[a.k]-order[b.k]).forEach(it=>BL.layer.appendChild(it.el));
+}
+/* 자석 결합 — 길이가 같고 색이 다른 X자끼리만 붙는다 */
+function blSnap(it){
+  if(it.k!=="x" || it.bond) return;
+  let best=null, bd=1e9;
+  for(const o of BL.items){
+    if(o===it || o.k!=="x" || o.bond || o.z!==it.z || o.c===it.c) continue;
+    const d = Math.hypot(o.x-it.x, o.y-it.y);
+    if(d<bd){ bd=d; best=o; }
+  }
+  if(best && bd < BL.SEPX*S*blSc(it)*3.0){
+    best.sc = blSc(it);
+    it.bond = best.id; best.bond = it.id;
+    it.x = (it.x + best.x)/2; it.y = (it.y + best.y)/2;
+    best.x = it.x; best.y = it.y;
+    best.hid = true;                          // 붙은 뒤에는 한쪽 그룹이 둘을 함께 그린다
+    blDraw(best);                             // 숨김 상태를 실제 화면에 반영해야 한다
+    blDraw(it);
+  }
+}
+function blUnbond(it){
+  const p = it.bond ? blFind(it.bond) : null;
+  if(!p) return;
+  it.bond = null; p.bond = null; p.hid = false;
+  p.x = it.x + BL.SEPX*S*blSc(it)*1.8; p.y = it.y;
+  it.x = it.x - BL.SEPX*S*blSc(it)*0.6;
+  blDraw(it); blDraw(p);
+}
+function blFeed(html, ok){
+  const f = $("bFeed");
+  f.hidden = !html;
+  f.innerHTML = html;
+  f.style.color = ok===true ? "var(--ok)" : "";
+}
+
+/* ── 검사 ── */
+function blZoneOf(it, cells, nucs){
+  let cell=null, cd=1e9;
+  for(const c of cells){ const d=Math.hypot(c.x-it.x,c.y-it.y); if(d<cd){cd=d;cell=c;} }
+  if(!cell || cd > blCellR(cell)) return {cell:null};
+  const dx = (it.x - cell.x)/blCellR(cell);
+  let zone = (Math.abs(dx) < 0.30) ? "plate" : (Math.abs(dx) > 0.40 ? "pole" : "mid");
+  let inNuc = nucs.some(n=>Math.hypot(n.x-it.x,n.y-it.y) < BL.NUC*S*blSc(n));
+  return {cell:cell, zone:zone, nuc:inNuc};
+}
+function blCheck(){
+  if(BL.div==="free"){ return; }
+  const spec = BL_SPEC[BL.div][BL.step];
+  const cells = BL.items.filter(v=>v.k==="cell");
+  const nucs  = BL.items.filter(v=>v.k==="nuc");
+  const spin  = BL.items.filter(v=>v.k==="line");
+  const bad = [];
+
+  if(cells.length !== spec.cells) bad.push("세포막이 <b>"+spec.cells+"개</b> 있어야 하는데 "+cells.length+"개입니다.");
+  if(nucs.length  !== spec.nuc)   bad.push("핵막이 <b>"+(spec.nuc===0?"없어야":spec.nuc+"개 있어야")+"</b> 하는데 "+nucs.length+"개입니다.");
+  if(spec.spindle && spin.length<2) bad.push("이 단계에는 <b>방추사</b>가 필요합니다. 선 그리기로 두 가닥 이상 그려 보세요.");
+  if(!spec.spindle && spin.length>0)  bad.push("이 단계에는 <b>방추사가 없습니다</b>. 그린 선을 지우세요.");
+
+  for(const req of spec.need){
+    const [kind, n, zone] = req;
+    let list;
+    if(kind==="biv") list = BL.items.filter(v=>v.k==="x" && v.bond && !v.hid);
+    else             list = BL.items.filter(v=>v.k===kind && (kind!=="x" || !v.bond));
+    if(list.length !== n){
+      bad.push(BL_NAME[kind]+"가 <b>"+n+"개</b> 있어야 하는데 "+list.length+"개입니다.");
+      continue;
+    }
+    let outside=0, wrong=0;
+    for(const it of list){
+      const z = blZoneOf(it, cells, nucs);
+      if(!z.cell){ outside++; continue; }
+      if(zone==="nucleus" && !z.nuc) wrong++;
+      else if(zone==="plate" && z.zone!=="plate") wrong++;
+      else if(zone==="pole" && z.zone!=="pole") wrong++;
+    }
+    if(outside) bad.push("세포 밖에 놓인 조각이 <b>"+outside+"개</b> 있습니다.");
+    else if(wrong) bad.push(BL_NAME[kind]+"를 <b>"+BL_ZONE[zone]+"</b>에 놓아야 합니다. "+wrong+"개가 어긋나 있습니다.");
+  }
+  /* 상동 염색체가 짝을 이루었는지 (개수만 맞고 색·길이가 틀린 경우) */
+  const cnt = {};
+  BL.items.filter(v=>v.k==="thread"||v.k==="x"||v.k==="one").forEach(v=>{ const key=v.c+v.z; cnt[key]=(cnt[key]||0)+1; });
+  const keys = ["redL","blueL","redS","blueS"];
+  if(keys.some(k=>cnt[k]) && !(cnt.redL===cnt.blueL && cnt.redS===cnt.blueS))
+    bad.push("빨강과 파랑이 <b>같은 수</b>여야 합니다. 상동 염색체는 길이가 같고 색이 다른 짝입니다.");
+
+  if(bad.length===0) blFeed("<b>맞았습니다!</b> " + spec.goal.replace(/하세요\.$/,"한 모습입니다.").replace(/세요\.$/,"ㄴ 모습입니다."), true);
+  else blFeed("<b>아직 아닙니다.</b><br>· " + bad.slice(0,4).join("<br>· "));
+}
+
+/* ── 팔레트·작업판 ── */
+function blPaletteIcon(kind){
+  const w=70,h=34;
+  const svg = ['<svg viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'];
+  const col = kind.c==="red" ? "var(--chr-red)" : "var(--chr-blue)";
+  const long = kind.z==="L";
+  if(kind.k==="cell") svg.push('<circle cx="35" cy="17" r="14" fill="var(--cyto)" stroke="var(--cyto-line)" stroke-width="2"/>');
+  else if(kind.k==="nuc") svg.push('<circle cx="35" cy="17" r="10" fill="var(--nuc)" fill-opacity=".6" stroke="var(--nuc-line)" stroke-width="2"/>');
+  else if(kind.k==="line") svg.push('<line x1="12" y1="27" x2="58" y2="7" stroke="var(--spindle)" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="27" r="3" fill="var(--accent)"/><circle cx="58" cy="7" r="3" fill="var(--accent)"/>');
+  else if(kind.k==="thread"){
+    const y0 = long?4:8, y1 = long?30:26;
+    svg.push('<path d="M35 '+y0+' C27 '+(y0+7)+' 43 '+(y0+13)+' 35 '+((y0+y1)/2)+' C27 '+(y1-7)+' 43 '+(y1-3)+' 35 '+y1+'" fill="none" stroke="'+col+'" stroke-width="2.4" stroke-linecap="round"/>');
+  }
+  else {
+    const y0 = long?5:9, y1 = long?29:25, mid=(y0+y1)/2, sp=6;
+    const arm=(s)=>'<path d="M'+(35+s*sp)+' '+y0+' Q'+(35+s*1.5)+' '+mid+' '+(35+s*sp)+' '+y1+'" fill="none" stroke="'+col+'" stroke-width="3.4" stroke-linecap="round"/>';
+    svg.push(kind.k==="x" ? arm(1)+arm(-1) : arm(1));
+  }
+  svg.push('</svg>');
+  return svg.join("");
+}
+function blSetLineTool(on){
+  BL.lineTool = !!on;
+  document.documentElement.classList.toggle("bl-line", BL.lineTool);
+  document.querySelectorAll("#palette .pitem").forEach((o,j)=>{
+    if(BL_KINDS[j] && BL_KINDS[j].tool) o.setAttribute("aria-pressed", String(BL.lineTool));
+  });
+}
+function blBuildPalette(){
+  const p = $("palette"); p.innerHTML = "";
+  BL_KINDS.forEach((kind,i)=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="pitem"; b.setAttribute("aria-pressed","false");
+    b.innerHTML = blPaletteIcon(kind) + "<span>"+kind.label+"</span>";
+    if(kind.tool){
+      /* 선 그리기는 켜고 끄는 도구 — 켜면 작업판을 끌어 선을 그린다 */
+      b.addEventListener("click",()=> blSetLineTool(!BL.lineTool));
+    } else {
+      /* 팔레트에서 바로 끌어다 놓는다 — 누르는 순간 조각이 생겨 손가락을 따라온다 */
+      b.addEventListener("pointerdown", e=>{
+        if(MODE!=="build") return;
+        e.preventDefault();
+        const pt = blPoint(e); if(!pt) return;
+        blMark();
+        const it = blAdd(kind, pt.x, pt.y);
+        blRestack();
+        blStartDrag(it, pt, true);
+      });
+    }
+    p.appendChild(b);
+  });
+}
+function blStepButtons(){
+  const seg = $("bStepSeg"); seg.innerHTML = "";
+  seg.hidden = (BL.div==="free");
+  if(BL.div==="free"){ $("bGoal").hidden = true; $("bCheck").hidden = true; return; }
+  $("bCheck").hidden = false;
+  const steps = (BL.div==="mitosis"?MITOSIS:MEIOSIS).steps;
+  steps.forEach((s,i)=>{
+    const b=document.createElement("button"); b.type="button";
+    b.textContent = s.short||s.name;
+    b.setAttribute("aria-pressed", String(i===BL.step));
+    b.addEventListener("click",()=>{ BL.step=i; blStepButtons(); blFeed(""); });
+    seg.appendChild(b);
+  });
+  const g = BL_SPEC[BL.div][BL.step];
+  $("bGoal").hidden = false;
+  $("bGoal").textContent = (BL.div==="mitosis"?"체세포 분열 ":"감수 분열 ") + steps[BL.step].name + " — " + g.goal;
+}
+function blPoint(e){
+  const m = stage.getScreenCTM(); if(!m) return null;
+  const pt = stage.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY;
+  return pt.matrixTransform(m.inverse());
+}
+/* ── 실행 취소 / 다시 실행 ──
+   조각 목록을 통째로 찍어 두고 되돌린다. 바뀌기 '직전'에 찍는다. */
+function blSnapshot(){
+  return BL.items.map(v=>({id:v.id,k:v.k,c:v.c,z:v.z,label:v.label,tool:v.tool,
+    x:v.x,y:v.y,ax:v.ax,ay:v.ay,bx:v.bx,by:v.by,sc:v.sc,bond:v.bond,hid:v.hid,a:v.a,ph:v.ph}));
+}
+function blMark(){
+  BL.undo.push(blSnapshot());
+  if(BL.undo.length > 60) BL.undo.shift();
+  BL.redo.length = 0;
+  blUpdHist();
+}
+function blRestoreSnap(snap){
+  BL.items.slice().forEach(v=>v.el.remove());
+  BL.items = []; BL.sel = null; BL.drag = null; BL.grip = null; BL.lineDraw = null;
+  snap.forEach(s=>{
+    const it = Object.assign({}, s);
+    it.el = el("g",{"data-pid":it.id});
+    BL.layer.appendChild(it.el);
+    BL.items.push(it);
+  });
+  BL.items.forEach(blDraw);
+  blRestack();
+  BL.seq = BL.items.reduce((m,v)=>Math.max(m,v.id), 0);
+}
+function blUndo(){
+  if(!BL.undo.length) return;
+  BL.redo.push(blSnapshot());
+  blRestoreSnap(BL.undo.pop());
+  blUpdHist(); blFeed("");
+}
+function blRedo(){
+  if(!BL.redo.length) return;
+  BL.undo.push(blSnapshot());
+  blRestoreSnap(BL.redo.pop());
+  blUpdHist(); blFeed("");
+}
+function blUpdHist(){
+  $("bUndo").disabled = !BL.undo.length;
+  $("bRedo").disabled = !BL.redo.length;
+}
+
+/* 오른쪽 위 휴지통 */
+const BL_TRASH = {x:872, y:14, w:108, h:108};
+/* 커서가 아니라 '조각'이 휴지통과 겹치는지를 본다 — 커서를 단추까지 끌고 갈 필요가 없다.
+   상자를 0.75배로 조금 줄여서, 세포막처럼 큰 조각이 멀리서 스치기만 해도 버려지는 것은 막는다. */
+/* 선분이 네모와 겹치는지 (Liang–Barsky) — 끝점뿐 아니라 선 어디든 닿으면 참 */
+function segHitsRect(x1,y1,x2,y2, rx,ry,rw,rh){
+  let t0=0, t1=1;
+  const dx=x2-x1, dy=y2-y1;
+  const p=[-dx, dx, -dy, dy];
+  const q=[x1-rx, rx+rw-x1, y1-ry, ry+rh-y1];
+  for(let i=0;i<4;i++){
+    if(p[i]===0){ if(q[i]<0) return false; }
+    else{
+      const r=q[i]/p[i];
+      if(p[i]<0){ if(r>t1) return false; if(r>t0) t0=r; }
+      else      { if(r<t0) return false; if(r<t1) t1=r; }
+    }
+  }
+  return true;
+}
+function blHitsTrash(it, pad){
+  const t = BL_TRASH, m = pad||0;
+  const cx = t.x + t.w/2, cy = t.y + t.h/2;
+  if(it.k==="line"){
+    const e = m + 5;                     // 선 굵기만큼 살짝 너그럽게
+    return segHitsRect(it.ax,it.ay,it.bx,it.by, t.x-e, t.y-e, t.w+2*e, t.h+2*e);
+  }
+  const b = blBox(it);
+  return Math.abs(it.x-cx) < b.w*0.375 + t.w/2 + m &&
+         Math.abs(it.y-cy) < b.h*0.375 + t.h/2 + m;
+}
+/* 휴지통으로 빨려 들어가며 사라지는 효과 */
+function blDrop(it){
+  if(it.bond){ const p = blFind(it.bond); if(p){ p.bond=null; p.hid=false; blDraw(p); } }
+  if(BL.sel===it) BL.sel = null;
+  BL.items = BL.items.filter(v=>v!==it);
+  const g = it.el;
+  const tr = $("blTrash");
+  tr.classList.remove("hot");
+  if(reduce){ g.remove(); return; }
+  const cx = BL_TRASH.x + BL_TRASH.w/2, cy = BL_TRASH.y + 58;
+  g.classList.add("bl-gone");
+  g.style.transformOrigin = it.x+"px "+it.y+"px";
+  g.getBoundingClientRect();                       // 전환이 걸리도록 한 번 훑는다
+  g.style.transition = "transform .42s cubic-bezier(.45,.02,.75,.2), opacity .42s ease";
+  g.style.transform = "translate("+(cx-it.x).toFixed(1)+"px,"+(cy-it.y).toFixed(1)+"px) scale(.04) rotate(420deg)";
+  g.style.opacity = "0";
+  setTimeout(()=>g.remove(), 470);
+  tr.classList.add("suck");
+  setTimeout(()=>tr.classList.remove("suck"), 340);
+}
+function blStartDrag(it, p, fromPalette){
+  BL.drag = {it:it, dx:it.x-p.x, dy:it.y-p.y, fromPalette:!!fromPalette};
+  blSelect(it);
+  $("blFront").appendChild(it.el);       // 끄는 동안에는 휴지통보다 위에
+  document.documentElement.classList.add("bl-dragging");
+}
+function blMove(e){
+  if(MODE!=="build") return;
+  const p = blPoint(e); if(!p) return;
+
+  if(BL.lineDraw){                       // 선을 끌어 그리는 중
+    e.preventDefault();
+    const it = BL.lineDraw;
+    it.bx = p.x; it.by = p.y;
+    it.x = (it.ax+it.bx)/2; it.y = (it.ay+it.by)/2;
+    blDraw(it);
+    $("blTrash").classList.toggle("hot", blHitsTrash(it));
+    return;
+  }
+  if(BL.grip){                           // 손잡이로 크기를 바꾸는 중
+    e.preventDefault();
+    const gz = BL.grip, it = gz.it;
+    if(gz.h==="a" || gz.h==="b"){        // 선의 끝점 옮기기
+      if(gz.h==="a"){ it.ax=p.x; it.ay=p.y; } else { it.bx=p.x; it.by=p.y; }
+      it.x=(it.ax+it.bx)/2; it.y=(it.ay+it.by)/2;
+      blDraw(it); return;
+    }
+    const d = Math.hypot(p.x-it.x, p.y-it.y);
+    blResize(it, gz.sc0 * (d/Math.max(8,gz.d0)));
+    return;
+  }
+  if(!BL.drag) return;
+  e.preventDefault();
+  const d = BL.drag, it = d.it;
+  const nx = p.x + d.dx, ny = p.y + d.dy;
+  if(it.k==="line"){ const sx=nx-it.x, sy=ny-it.y; it.ax+=sx; it.ay+=sy; it.bx+=sx; it.by+=sy; }
+  it.x = nx; it.y = ny;
+  blDraw(it);
+  const mate = it.bond ? blFind(it.bond) : null;
+  if(mate){ mate.x = it.x; mate.y = it.y; }
+  /* 닿아 있으면 휴지통이 붉어진다. 실제로 버려지는 것은 손을 뗐을 때다 */
+  $("blTrash").classList.toggle("hot", blHitsTrash(it));
+}
+function blUp(e){
+  const p = blPoint(e);
+  if(BL.lineDraw){
+    const it = BL.lineDraw; BL.lineDraw = null;
+    document.documentElement.classList.remove("bl-dragging");
+    $("blTrash").classList.remove("hot");
+    if(Math.hypot(it.bx-it.ax, it.by-it.ay) < 14) blRemove(it);   // 그냥 톡 누른 것은 취소
+    else if(blHitsTrash(it)) blDrop(it);
+    else { blRestack(); blSelect(it); }
+    return;
+  }
+  if(BL.grip){ BL.grip = null; document.documentElement.classList.remove("bl-dragging"); return; }
+  if(!BL.drag) return;
+  const d = BL.drag, it = d.it;
+  BL.drag = null;
+  document.documentElement.classList.remove("bl-dragging");
+  $("blTrash").classList.remove("hot");
+  if(blHitsTrash(it)){ blDrop(it); return; }
+  /* 팔레트를 끌지 않고 톡 눌렀을 때는 작업판 가운데에 놓아 준다 */
+  if(d.fromPalette && p && (p.x<12 || p.x>988 || p.y<12 || p.y>608)){ it.x=CX; it.y=CY; }
+  BL.layer.appendChild(it.el);           // 제자리 층으로 되돌린다
+  blSnap(it); blRestack(); blDraw(it);
+}
+
+function blInit(){
+  BL.layer = $("buildLayer");
+  blBuildPalette(); blStepButtons();
+  stage.addEventListener("pointerdown", e=>{
+    if(MODE!=="build") return;
+    const p = blPoint(e); if(!p) return;
+    const btn = e.target.closest ? e.target.closest("[data-blbtn]") : null;
+    if(btn){
+      e.preventDefault();
+      if(btn.getAttribute("data-blbtn")==="clear") blClear();
+      else blSetLineTool(false);
+      return;
+    }
+    /* 조각 위에 뜬 '분리' 단추 */
+    const act = e.target.closest ? e.target.closest("[data-act]") : null;
+    if(act && BL.sel){ e.preventDefault(); if(act.getAttribute("data-act")==="split"){ blMark(); blUnbond(BL.sel); } return; }
+    /* 크기 손잡이를 잡았나 */
+    const gh = e.target.closest ? e.target.closest(".bl-h") : null;
+    if(gh && BL.sel){
+      e.preventDefault();
+      blMark();
+      BL.grip = {it:BL.sel, h:gh.getAttribute("data-h"),
+                 d0:Math.hypot(p.x-BL.sel.x, p.y-BL.sel.y), sc0:blSc(BL.sel)};
+      document.documentElement.classList.add("bl-dragging");
+      return;
+    }
+    const hit = e.target.closest ? e.target.closest("[data-pid]") : null;
+    const it = hit ? blFind(parseInt(hit.getAttribute("data-pid"),10)) : null;
+    if(it){ e.preventDefault(); blMark(); blStartDrag(it, p, false); return; }
+    if(BL.lineTool){                     // 빈 곳에서 끌면 선을 그린다
+      e.preventDefault();
+      blMark();
+      const ln = blAdd({k:"line"}, p.x, p.y);
+      ln.ax = p.x; ln.ay = p.y; ln.bx = p.x; ln.by = p.y;
+      BL.lineDraw = ln;
+      blSelect(null);
+      document.documentElement.classList.add("bl-dragging");
+      return;
+    }
+    blSelect(null);
+  });
+  document.addEventListener("pointermove", blMove, {passive:false});
+  document.addEventListener("pointerup", blUp);
+  document.addEventListener("pointercancel", blUp);
+  stage.addEventListener("dblclick", e=>{
+    if(MODE!=="build") return;
+    const hit = e.target.closest ? e.target.closest("[data-pid]") : null;
+    if(!hit) return;
+    const it = blFind(parseInt(hit.getAttribute("data-pid"),10));
+    if(it && it.bond){ blMark(); blUnbond(it); }
+  });
+  $("bUndo").addEventListener("click", blUndo);
+  $("bRedo").addEventListener("click", blRedo);
+  document.querySelectorAll("#bDivSeg button").forEach(b=>{
+    b.addEventListener("click",()=>{
+      BL.div = b.dataset.bd; BL.step = 0;
+      document.querySelectorAll("#bDivSeg button").forEach(o=>o.setAttribute("aria-pressed", String(o===b)));
+      blStepButtons(); blFeed("");
+    });
+  });
+  $("bCheck").addEventListener("click", blCheck);
+}
+
 /* ───────── 모드 적용 ───────── */
 function applyMode(mode){
   MODE = mode;
-  const compare = (mode==="compare");
+  const compare = (mode==="compare"), quiz = (mode==="quiz");
+  document.documentElement.setAttribute("data-scen", mode);
+  if(mode==="build"){
+    pause();
+    $("sub").innerHTML = "조각을 끌어다 놓아 <b>각 단계를 직접 만들어</b> 봅니다. 단계를 고르고 만든 뒤 <b>검사</b>를 누르면 무엇이 맞고 틀렸는지 알려 줍니다. 자유 배치로 마음껏 놓아 볼 수도 있습니다.";
+    $("rowBands").setAttribute("opacity","0");
+    hideLens();
+    BL.undo.length = 0; BL.redo.length = 0; blUpdHist();
+    return;
+  }
+  if(quiz){
+    if(!rendA) rendA = new Renderer();
+    if(!rendB) rendB = new Renderer();
+    $("sub").innerHTML = "그림만 보고 <b>어느 분열의 어느 단계</b>인지 맞혀 보세요. 단계 이름·눈금·이름표는 가려집니다. 돋보기는 그대로 쓸 수 있습니다.";
+    $("rowBands").setAttribute("opacity","0");
+    SC = MITOSIS; DUR = SC.dur.slice(); T_END = DUR.length;
+    CUM = [0]; for(let i=0;i<DUR.length;i++) CUM.push(CUM[i]+DUR[i]);
+    TOTAL = CUM[DUR.length];
+    quizDeal(); quizNew();
+    return;
+  }
+  setLoop(userLoop, true);               // 퀴즈에서 나오면 사용자가 고른 반복 설정으로 되돌린다
   SC = (mode==="mitosis") ? MITOSIS : MEIOSIS;      // 비교 모드의 기준 시계는 감수 분열
   DUR = SC.dur.slice();
   CUM = [0]; for(let i=0;i<DUR.length;i++) CUM.push(CUM[i]+DUR[i]);
   TOTAL = CUM[DUR.length];
   T_END = DUR.length;
 
-  document.documentElement.setAttribute("data-scen", mode);
   $("sub").innerHTML = compare ? COMPARE.sub : SC.sub;
   $("qText").textContent = compare ? COMPARE.question : SC.question;
   $("answer").innerHTML = compare ? COMPARE.answer : SC.answer;
@@ -1134,6 +2113,7 @@ Renderer.prototype.draw = function(t, useLabels){
 
 /* 모드에 따라 한 무대 또는 두 무대를 그린다 */
 function draw(){
+  if(MODE==="quiz"){ rendA.draw(t, false); return; }   // 설명 패널은 퀴즈 쪽에서 따로 관리한다
   if(MODE==="compare"){
     rendA.draw(Math.min(t, rendA.cap), false);
     rendB.draw(t, false);
@@ -1155,7 +2135,12 @@ function updatePanel(){
   $("stepNo").textContent = i+1;
   $("stepName").textContent = s.name;
   $("stepLine").textContent = s.line;
-  $("clock").textContent = (i+1)+" / "+SC.steps.length+" 단계"+(finished?" 끝":"")+" · 2n="+N_CHR;
+  /* 감수 분열은 도중에 염색체 수가 절반이 되므로, 처음 수와 지금 세포당 수를 나누어 적는다 */
+  let tag = "2n=" + N_CHR + " 처음 염색체 수";
+  if(MODE!=="compare" && t >= 5){
+    tag = "처음 2n=" + N_CHR + " → 세포당 " + (SC===MEIOSIS ? "n="+(N_CHR/2) : "2n="+N_CHR);
+  }
+  $("clock").textContent = (i+1)+" / "+SC.steps.length+" 단계"+(finished?" 끝":"")+" · "+tag;
 
   tlBtns.forEach((b,n)=>{
     if(n===i) b.b.setAttribute("aria-current","step"); else b.b.removeAttribute("aria-current");
@@ -1202,7 +2187,7 @@ function showLensAt(e){
 }
 function hideLens(){ lens.setAttribute("opacity","0"); }
 function onLensMove(e){
-  if(!lensOn){ hideLens(); return; }
+  if(!lensOn || MODE==="build"){ hideLens(); return; }   // 배열 탭에서는 끌어놓기와 부딪힌다
   if(e.pointerType === "touch" && !lensDown){ hideLens(); return; }
   showLensAt(e);
 }
@@ -1227,6 +2212,14 @@ function goTo(v){ showFinished = false; setT(v); }
    step : 한 단계를 계속 되풀이 — 후기만 여러 번 보여 줄 때
    all  : 끝까지 가면 처음부터 다시
    반복 사이에는 끝난 모습을 잠깐 보여 주고 돌아간다. */
+/* 조작부 버튼과 무대 위 버튼의 재생 상태를 함께 맞춘다 */
+function syncPlayUI(on){
+  $("playBtn").textContent = on ? "❚❚ 멈춤" : "▶ 재생";
+  const f = $("fPlay");
+  f.classList.toggle("is-playing", on);
+  f.setAttribute("aria-label", on ? "멈춤" : "재생");
+}
+
 let loopMode = "off", loopFrom = 0, loopTo = 1, holdUntil = 0;
 
 /* '이 단계'가 어느 단계인가 — 오른쪽 패널이 보여 주고 있는 바로 그 단계 */
@@ -1247,7 +2240,7 @@ function play(){
     if(t >= T_END-1e-6) setT(0);
   }
   playing=true; last=performance.now();
-  $("playBtn").textContent="❚❚ 멈춤";
+  syncPlayUI(true);
   if(rafId) cancelAnimationFrame(rafId);
   rafId = requestAnimationFrame(tick);
 }
@@ -1255,7 +2248,7 @@ function play(){
 function pause(){
   playing=false; holdUntil=0;
   if(rafId){ cancelAnimationFrame(rafId); rafId=0; }
-  $("playBtn").textContent="▶ 재생";
+  syncPlayUI(false);
 }
 function tick(now){
   rafId = 0;
@@ -1312,8 +2305,10 @@ document.querySelectorAll("#spSeg button").forEach(b=>{
   });
 });
 
-function setLoop(mode){
+let userLoop = "off";                    // 퀴즈가 반복을 강제로 켜므로 사용자의 설정을 따로 기억한다
+function setLoop(mode, quietly){
   loopMode = mode;
+  if(!quietly) userLoop = mode;
   document.querySelectorAll("#loopSeg button").forEach(o=>o.setAttribute("aria-pressed", String(o.dataset.loop===mode)));
   if(holdUntil){ holdUntil = 0; }
   if(playing && mode==="step") setLoopStep();
@@ -1341,9 +2336,14 @@ function toggleFullscreen(){
 function onFsChange(){
   const on = !!fsNow();
   $("fsBtn").querySelector("span").textContent = on ? "전체 화면 끝내기" : "전체 화면";
+  $("fFs").classList.toggle("is-fs", on);
+  $("fFs").setAttribute("aria-label", on ? "전체 화면 끝내기" : "전체 화면");
   hideLens();
 }
 $("fsBtn").addEventListener("click", toggleFullscreen);
+$("fFs").addEventListener("click", toggleFullscreen);
+$("fPlay").addEventListener("click", ()=> playing ? pause() : play());
+if(!fsReq) $("fFs").hidden = true;
 document.addEventListener("fullscreenchange", onFsChange);
 document.addEventListener("webkitfullscreenchange", onFsChange);
 document.querySelectorAll("#nSeg button").forEach(b=>{
@@ -1353,11 +2353,11 @@ document.querySelectorAll("#nSeg button").forEach(b=>{
     draw();
   });
 });
-document.querySelectorAll("#modes button").forEach(b=>{
+document.querySelectorAll("#modes button, #modes2 button").forEach(b=>{
   b.addEventListener("click",()=>{
     if(b.getAttribute("aria-pressed")==="true") return;
     pause();
-    document.querySelectorAll("#modes button").forEach(o=>o.setAttribute("aria-pressed", String(o===b)));
+    document.querySelectorAll("#modes button, #modes2 button").forEach(o=>o.setAttribute("aria-pressed", String(o===b)));
     applyMode(b.dataset.mode);
   });
 });
@@ -1372,15 +2372,36 @@ $("ansBtn").addEventListener("click",()=>{
   $("ansBtn").setAttribute("aria-expanded",String(open));
   $("ansBtn").textContent = open? "답 숨기기" : "답 확인하기";
 });
+/* 해·달 토글 — 지금이 어두우면 해(밝게 가기), 밝으면 달(어둡게 가기)을 보여 준다 */
+const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
+function themeIsDark(){
+  const a = document.documentElement.getAttribute("data-theme");
+  return a ? a==="dark" : mqDark.matches;
+}
+function updThemeBtn(){
+  const d = themeIsDark();
+  $("themeBtn").setAttribute("aria-checked", String(d));
+  $("themeBtn").setAttribute("aria-label", d ? "어두운 화면 켜짐" : "어두운 화면 꺼짐");
+}
 $("themeBtn").addEventListener("click",()=>{
-  const cur=document.documentElement.getAttribute("data-theme");
-  const dark = cur? cur==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.setAttribute("data-theme", dark? "light":"dark");
+  document.documentElement.setAttribute("data-theme", themeIsDark() ? "light" : "dark");
+  updThemeBtn();
 });
+if(mqDark.addEventListener) mqDark.addEventListener("change", updThemeBtn);
+updThemeBtn();
 
 document.addEventListener("keydown",e=>{
   const tag=(e.target.tagName||"").toLowerCase();
   if(tag==="input"&&e.target.type!=="range"||tag==="textarea") return;
+  /* 퀴즈에서는 그림을 움직이는 키를 막는다. 전체 화면만 열어 둔다 */
+  if(MODE==="build"){
+    if(e.code==="KeyF" && !e.ctrlKey && !e.metaKey){ e.preventDefault(); toggleFullscreen(); }
+    else if((e.ctrlKey||e.metaKey) && e.code==="KeyZ"){ e.preventDefault(); e.shiftKey ? blRedo() : blUndo(); }
+    else if((e.ctrlKey||e.metaKey) && e.code==="KeyY"){ e.preventDefault(); blRedo(); }
+    else if(e.code==="Escape"){ blSetLineTool(false); blSelect(null); }
+    return;
+  }
+  if(MODE==="quiz"){ if(e.code==="KeyF"){ e.preventDefault(); toggleFullscreen(); } return; }
   if(e.key===" "){ e.preventDefault(); playing? pause() : play(); }
   else if(e.key==="ArrowLeft"){ e.preventDefault(); pause(); goTo(clamp(Math.ceil(t-0.02)-1,0,T_END-1)); }
   else if(e.key==="ArrowRight"){ e.preventDefault(); pause(); goTo(clamp(Math.floor(t+0.02)+1,0,T_END)); }
@@ -1397,8 +2418,9 @@ $("foot").innerHTML = "모세포의 염색체 수는 2·4·8·16·46 중에서 �
   "적도면은 체세포 분열과 감수 2분열에서는 한 줄, 결합이 일어나는 감수 1분열에서만 두 줄입니다. "+
   "세포질이 잘록해지며 나뉘는 모습은 동물 세포 기준이며, 식물 세포에서는 가운데에 세포판이 생기며 나뉩니다. "+
   "감수 2분열의 딸세포 네 개는 교과서에서는 2×2로 그려져 있지만 여기서는 가로로 늘어놓았습니다."+
-  '<span class="rev">rev 16</span>';
+  '<span class="rev">rev 27</span>';
 
+blInit();
 applyMode("mitosis");
 if(reduce) pause();
 })();
